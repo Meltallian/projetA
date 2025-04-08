@@ -1,0 +1,79 @@
+<!-- game/templates/game/register_players.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Register Players - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Register Players</h2>
+    <p>Enter player names and their 4-digit verification codes</p>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div id="player-entries">
+            <div class="player-entry">
+                <div>
+                    <label for="name-1">Player Name:</label>
+                    <input type="text" id="name-1" name="name[]" required>
+                </div>
+                <div>
+                    <label for="code-1">Verification Code (4 digits):</label>
+                    <input type="text" id="code-1" name="code[]" required maxlength="4" pattern="[0-9]*">
+                </div>
+            </div>
+            
+            <div class="player-entry">
+                <div>
+                    <label for="name-2">Player Name:</label>
+                    <input type="text" id="name-2" name="name[]" required>
+                </div>
+                <div>
+                    <label for="code-2">Verification Code (4 digits):</label>
+                    <input type="text" id="code-2" name="code[]" required maxlength="4" pattern="[0-9]*">
+                </div>
+            </div>
+            
+            <!-- More player entry fields can be added dynamically -->
+        </div>
+        
+        <button type="button" id="add-player">Add Another Player</button>
+        <button type="submit">Register Players</button>
+    </form>
+    
+    <div>
+        <a href="#" id="back-link">Back to Game Panel</a>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Script to dynamically add more player entry fields
+    document.getElementById('add-player').addEventListener('click', function() {
+        const playerEntries = document.getElementById('player-entries');
+        const playerCount = playerEntries.children.length + 1;
+        
+        const newEntry = document.createElement('div');
+        newEntry.className = 'player-entry';
+        newEntry.innerHTML = `
+            <div>
+                <label for="name-${playerCount}">Player Name:</label>
+                <input type="text" id="name-${playerCount}" name="name[]" required>
+            </div>
+            <div>
+                <label for="code-${playerCount}">Verification Code (4 digits):</label>
+                <input type="text" id="code-${playerCount}" name="code[]" required maxlength="4" pattern="[0-9]*">
+            </div>
+        `;
+        
+        playerEntries.appendChild(newEntry);
+    });
+    
+    // Update back link to point to the proper game master panel
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.pathname);
+        const gameId = urlParams.get('/master/') || '00000000-0000-0000-0000-000000000000';
+        document.getElementById('back-link').href = `/master/${gameId}/`;
+    });
+</script>
+{% endblock %}
+{% endblock %}

@@ -1,0 +1,71 @@
+<!-- game/templates/game/master_panel.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Game Master Panel - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Game Master Control Panel</h2>
+    
+    <div>
+        <h3>Game Information</h3>
+        <p>Game Name: <span id="game-name">Game Name Placeholder</span></p>
+        <p>Room Code: <strong id="room-code">ABCDEF</strong></p>
+        <p>Status: <span id="game-status">Waiting for players</span></p>
+    </div>
+    
+    <div>
+        <h3>Player Management</h3>
+        <a href="{% url 'register_players' game_id='00000000-0000-0000-0000-000000000000' %}">Register Players</a>
+        
+        <h4>Current Players</h4>
+        <ul id="player-list">
+            <li>Player 1</li>
+            <li>Player 2</li>
+            <!-- Player list will be populated dynamically -->
+        </ul>
+    </div>
+    
+    <div>
+        <h3>Game Controls</h3>
+        <button id="start-game">Start Game</button>
+        <button id="end-game">End Game</button>
+    </div>
+    
+    <div>
+        <h3>Clue Management</h3>
+        <div id="clue-list">
+            <!-- Clue list will be populated dynamically -->
+            <div class="clue">
+                <h4>Clue 1</h4>
+                <p>Clue description placeholder</p>
+                <p>Reveal at: 15 minutes</p>
+                <button>Release Now</button>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <h3>Player Inquiries</h3>
+        <div id="inquiry-list">
+            <!-- Inquiry list will be populated dynamically -->
+            <div class="inquiry">
+                <p><strong>Player 1:</strong> Is the murder weapon in the kitchen?</p>
+                <textarea placeholder="Your response..."></textarea>
+                <button>Send Response</button>
+            </div>
+        </div>
+    </div>
+    
+    <div>
+        <a href="{% url 'master_dashboard' %}">Back to Dashboard</a>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Placeholder for WebSocket connection and control panel functionality
+    // Will be implemented when we add WebSocket functionality
+</script>
+{% endblock %}
+{% endblock %}

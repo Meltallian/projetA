@@ -1,0 +1,22 @@
+<!-- game/templates/game/register_gm.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Register Game Master - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Register as Game Master</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="verification_code">Verification Code (4 digits):</label>
+            <input type="password" id="verification_code" name="verification_code" required maxlength="4" pattern="[0-9]*">
+        </div>
+        <button type="submit">Register</button>
+    </form>
+</div>
+{% endblock %}

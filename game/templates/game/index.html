@@ -1,0 +1,16 @@
+<!-- game/templates/game/index.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Welcome - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Welcome to ProjetA Murder Mystery</h2>
+    <p>A game master app for managing murder mystery games</p>
+    
+    <div>
+        <a href="{% url 'player_login' %}">Player Login</a>
+        <a href="{% url 'register_game_master' %}">Register as Game Master</a>
+    </div>
+</div>
+{% endblock %}

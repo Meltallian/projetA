@@ -1,0 +1,48 @@
+<!-- game/templates/game/master_dashboard.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Game Master Dashboard - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Game Master Dashboard</h2>
+    
+    <div>
+        <a href="{% url 'create_game' %}" class="button">Create New Game</a>
+    </div>
+    
+    <div>
+        <h3>Your Games</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Game Name</th>
+                    <th>Room Code</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Players</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mystery Manor</td>
+                    <td>ABC123</td>
+                    <td>Waiting</td>
+                    <td>2023-04-12</td>
+                    <td>0/10</td>
+                    <td>
+                        <a href="#">Manage</a>
+                    </td>
+                </tr>
+                <!-- Game list will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+    
+    <div>
+        <a href="{% url 'index' %}">Back to Home</a>
+        <a href="{% url 'player_logout' %}">Logout</a>
+    </div>
+</div>
+{% endblock %}

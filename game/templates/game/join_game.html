@@ -1,0 +1,21 @@
+<!-- game/templates/game/join_game.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Join Game - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Join a Game</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="room_code">Enter Room Code:</label>
+            <input type="text" id="room_code" name="room_code" required maxlength="6">
+        </div>
+        <button type="submit">Join Game</button>
+    </form>
+    <div>
+        <a href="{% url 'index' %}">Back to Home</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!-- game/templates/game/player_dashboard.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Player Dashboard - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Player Dashboard</h2>
+    
+    <div>
+        <a href="{% url 'join_game' %}" class="button">Join a Game</a>
+    </div>
+    
+    <div>
+        <h3>Your Active Games</h3>
+        <div id="active-games">
+            <div class="game-card">
+                <h4>Mystery Manor</h4>
+                <p>Status: Waiting for players</p>
+                <p>Character: Detective Smith</p>
+                <a href="#" class="button">Enter Game</a>
+            </div>
+            <!-- Game list will be populated dynamically -->
+        </div>
+    </div>
+    
+    <div>
+        <h3>Past Games</h3>
+        <div id="past-games">
+            <div class="game-card">
+                <h4>The Haunted Mansion</h4>
+                <p>Status: Completed</p>
+                <p>Character: The Butler</p>
+                <p>Result: You solved the mystery!</p>
+            </div>
+            <!-- Game list will be populated dynamically -->
+        </div>
+    </div>
+    
+    <div>
+        <a href="{% url 'index' %}">Back to Home</a>
+        <a href="{% url 'player_logout' %}">Logout</a>
+    </div>
+</div>
+{% endblock %}

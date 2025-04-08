@@ -1,0 +1,39 @@
+<!-- game/templates/game/lobby.html -->
+{% extends 'game/base.html' %}
+
+{% block title %}Game Lobby - ProjetA Murder Mystery{% endblock %}
+
+{% block content %}
+<div>
+    <h2>Game Lobby</h2>
+    <div>
+        <h3>Game: <span id="game-name">Game Name Placeholder</span></h3>
+        <p>Room Code: <strong id="room-code">ABCDEF</strong></p>
+        <p>Status: <span id="game-status">Waiting for players</span></p>
+    </div>
+    
+    <div>
+        <h3>Players</h3>
+        <ul id="player-list">
+            <li>Player 1</li>
+            <li>Player 2</li>
+            <!-- Player list will be populated dynamically -->
+        </ul>
+    </div>
+    
+    <div>
+        <p>Waiting for the game master to start the game...</p>
+    </div>
+    
+    <div>
+        <a href="{% url 'index' %}">Leave Game</a>
+    </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+    // Placeholder for WebSocket connection to update lobby in real-time
+    // Will be implemented when we add WebSocket functionality
+</script>
+{% endblock %}
+{% endblock %}

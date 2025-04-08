@@ -1,0 +1,43 @@
+services:
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+  
+  redis:
+    image: redis:6
+  
+  web:
+    build: .
+    command: bash -c "python manage.py collectstatic --noinput && daphne -b 0.0.0.0 -p 8000 projetA.asgi:application"
+    volumes:
+      - .:/code
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - ./.env
+  
+  nginx:
+    build: 
+      context: ./nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - nginx_certs:/etc/nginx/certs
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
+  nginx_certs:
+  static_volume:
+  media_volume:

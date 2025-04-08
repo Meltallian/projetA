@@ -1,0 +1,41 @@
+<!-- game/templates/game/base.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}ProjetA Murder Mystery{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Add your CSS here -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ProjetA Murder Mystery</h1>
+            <nav>
+                <!-- Add navigation links here -->
+            </nav>
+        </header>
+        
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+        
+        <footer>
+            <p>ProjetA Murder Mystery Game Master App</p>
+        </footer>
+    </div>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
