@@ -1,0 +1,85 @@
+<!-- game/templates/game/no_active_game.html -->
+{% extends 'game/base.html' %}
+{% block title %}No Active Game - ProjetA Murder Mystery{% endblock %}
+{% block content %}
+<div class="container no-game">
+    <h2>No Active Game</h2>
+    
+    <div class="no-game-message">
+        <div class="status-icon error"></div>
+        <h3>There is no active murder mystery game at the moment</h3>
+        <p>The Game Master hasn't launched a game yet. Please check back later.</p>
+    </div>
+    
+    <div class="player-info">
+        <h3>Hello, {{ player.name }}</h3>
+        <p>You are logged in and ready to play when a game becomes available.</p>
+        <p>When the Game Master launches a new game, you will automatically be able to join.</p>
+    </div>
+    
+    <div class="refresh-section">
+        <p>Checking for games automatically every 30 seconds...</p>
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+        <button id="refresh-button" class="button">Check Now</button>
+    </div>
+    
+    <div class="no-game-footer">
+        <a href="{% url 'player_logout' %}" class="button">Logout</a>
+    </div>
+</div>
+
+<script>
+    // Auto-refresh functionality
+    let progress = 0;
+    const progressBar = document.querySelector('.progress');
+    const refreshInterval = 30; // seconds
+    const updateFrequency = 100; // ms
+    const steps = (refreshInterval * 1000) / updateFrequency;
+    const increment = 100 / steps;
+    
+    function resetProgress() {
+        progress = 0;
+        progressBar.style.width = '0%';
+    }
+    
+    function updateProgress() {
+        progress += increment;
+        progressBar.style.width = `${Math.min(progress, 100)}%`;
+        
+        if (progress >= 100) {
+            checkForGame();
+        }
+    }
+    
+    function checkForGame() {
+        fetch("{% url 'check_game_status' %}")
+            .then(response => response.json())
+            .then(data => {
+                if (data.active_game) {
+                    window.location.href = data.redirect_url;
+                } else {
+                    resetProgress();
+                }
+            })
+            .catch(error => {
+                console.error('Error checking game status:', error);
+                resetProgress();
+            });
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Start progress bar
+        resetProgress();
+        const progressTimer = setInterval(updateProgress, updateFrequency);
+        
+        // Setup manual refresh button
+        document.getElementById('refresh-button').addEventListener('click', function() {
+            resetProgress();
+            checkForGame();
+        });
+    });
+</script>
+{% endblock %}

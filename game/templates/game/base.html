@@ -1,38 +1,121 @@
-<!-- game/templates/game/base.html -->
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>{% block title %}ProjetA Murder Mystery{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Add your CSS here -->
+	<link rel="stylesheet" href="{% static 'css/game.css' %}">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+        :root {
+            --dark-bg: #1a1a1a;
+            --darker-bg: #111111;
+            --accent: #aa0000;
+            --accent-light: #cc0000;
+            --text: #eeeeee;
+            --secondary-text: #aaaaaa;
         }
+        
+        body {
+            font-family: 'Georgia', serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text);
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--darker-bg);
+            padding: 20px;
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        h1, h2, h3 {
+            font-family: 'Times New Roman', serif;
+        }
+        
+        h1 {
+            margin: 0;
+            color: var(--accent-light);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .card {
+            background-color: var(--darker-bg);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent-light);
+        }
+        
+        .clue {
+            background-color: #2a2a2a;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin: 10px 0;
+        }
+        
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            color: var(--secondary-text);
+            font-size: 0.9em;
         }
     </style>
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
-    <div class="container">
-        <header>
+    <header>
+        <div class="container">
             <h1>ProjetA Murder Mystery</h1>
-            <nav>
-                <!-- Add navigation links here -->
-            </nav>
-        </header>
-        
+            {% if request.profile %}
+                <div style="float: right; margin-top: -30px;">
+                    Logged in as: {{ request.profile.name }}
+                    {% if request.profile.is_game_master %}
+                        <span style="color: gold; margin-left: 5px;">★ Game Master</span>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </header>
+    
+    <div class="container">
         <main>
+            {% if messages %}
+				{% for message in messages %}
+				<div class="alert" style="background-color: #0066aa; color: white; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
+					{{ message }}
+				</div>
+			{% endfor %}
+            {% endif %}
+            
             {% block content %}{% endblock %}
         </main>
         
         <footer>
-            <p>ProjetA Murder Mystery Game Master App</p>
+            <p>ProjetA Murder Mystery Game © 2025</p>
         </footer>
     </div>
     

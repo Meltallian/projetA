@@ -14,9 +14,15 @@ help:
 
 up:
 	sudo docker compose up -d
+	sudo docker compose exec web python manage.py makemigrations
+	sudo docker compose exec web python manage.py migrate
+	sudo docker compose exec web python manage.py ensure_default_users
 
 detach:
 	sudo docker compose up
+	sudo docker compose exec web python manage.py makemigrations
+	sudo docker compose exec web python manage.py migrate
+	sudo docker compose exec web python manage.py ensure_default_users
 
 down:
 	sudo docker compose down
@@ -33,6 +39,7 @@ shell:
 mig:
 	sudo docker compose exec web python manage.py makemigrations
 	sudo docker compose exec web python manage.py migrate
+	sudo docker compose exec web python manage.py ensure_default_users
 
 migrate:
 	sudo docker compose exec web python manage.py migrate

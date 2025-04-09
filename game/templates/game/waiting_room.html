@@ -1,0 +1,149 @@
+<!-- game/templates/game/waiting_room.html -->
+{% extends 'game/base.html' %}
+{% block title %}Waiting Room - ProjetA Murder Mystery{% endblock %}
+{% block content %}
+<div class="container waiting-room">
+    <h2>Game Waiting Room</h2>
+    
+    <div class="waiting-status">
+        <div class="status-icon spinning"></div>
+        <h3>Waiting for Game Master to Start the Game</h3>
+        <p>Please wait as the game is being prepared. The murder mystery will begin soon!</p>
+    </div>
+    
+    <div class="game-info">
+        <h3>{{ game.name }}</h3>
+        <p><strong>Game Master:</strong> {{ game.game_master.name }}</p>
+        <p><strong>Players Connected:</strong> <span id="player-count">{{ game.player_count }}</span>/<span id="max-players">{{ game.max_players }}</span></p>
+    </div>
+    
+    <div class="players-list">
+        <h3>Players in the Room</h3>
+        <ul id="players-list">
+            {% for player in game.players.all %}
+                <li class="player-item">{{ player.name }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    
+    <div class="character-info">
+        {% if player.character %}
+            <h3>Your Character</h3>
+            <div class="character-card">
+                <h4>{{ player.character.name }}</h4>
+                <p>{{ player.character.description }}</p>
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="waiting-footer">
+        <a href="{% url 'player_dashboard' %}" class="button">Back to Dashboard</a>
+    </div>
+</div>
+
+<!-- WebSocket Connection Script -->
+<script>
+    // WebSocket connection for waiting room updates
+    const gameId = "{{ game.id }}";
+    const playerId = "{{ player.id }}";
+    let socket;
+    
+    function setupWebsocket() {
+        // Adjust protocol (ws/wss) based on current page protocol
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}/ws/waiting/${gameId}/${playerId}/`;
+        
+        socket = new WebSocket(wsUrl);
+        
+        socket.onopen = function(e) {
+            console.log("WebSocket connection established");
+        };
+        
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            console.log("Message received:", data);
+            
+            // Handle different message types
+            switch(data.type) {
+                case 'player_update':
+                    updatePlayersList(data.players);
+                    document.getElementById('player-count').textContent = data.player_count;
+                    break;
+                case 'character_assigned':
+                    showCharacterInfo(data.character);
+                    break;
+                case 'game_started':
+                    // Redirect to game page
+                    window.location.href = data.redirect_url;
+                    break;
+                case 'gm_message':
+                    showGameMasterMessage(data.message);
+                    break;
+            }
+        };
+        
+        socket.onclose = function(e) {
+            console.log("WebSocket connection closed. Reconnecting...");
+            // Try to reconnect after a delay
+            setTimeout(setupWebsocket, 3000);
+        };
+        
+        socket.onerror = function(e) {
+            console.error("WebSocket error:", e);
+        };
+    }
+    
+    // Update the players list
+    function updatePlayersList(players) {
+        const playersList = document.getElementById('players-list');
+        playersList.innerHTML = '';
+        
+        players.forEach(player => {
+            const playerItem = document.createElement('li');
+            playerItem.className = 'player-item';
+            playerItem.textContent = player.name;
+            playersList.appendChild(playerItem);
+        });
+    }
+    
+    // Show character information when assigned
+    function showCharacterInfo(character) {
+        const characterInfoDiv = document.querySelector('.character-info');
+        
+        characterInfoDiv.innerHTML = `
+            <h3>Your Character</h3>
+            <div class="character-card">
+                <h4>${character.name}</h4>
+                <p>${character.description}</p>
+            </div>
+        `;
+    }
+    
+    // Show game master message
+    function showGameMasterMessage(message) {
+        // Create a message overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'message-overlay';
+        overlay.innerHTML = `
+            <div class="message-box">
+                <h3>Message from Game Master</h3>
+                <p>${message}</p>
+                <button class="close-button button">OK</button>
+            </div>
+        `;
+        
+        document.body.appendChild(overlay);
+        
+        // Close button functionality
+        overlay.querySelector('.close-button').addEventListener('click', function() {
+            document.body.removeChild(overlay);
+        });
+    }
+    
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup WebSocket connection
+        setupWebsocket();
+    });
+</script>
+{% endblock %}

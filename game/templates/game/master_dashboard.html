@@ -1,48 +1,68 @@
 <!-- game/templates/game/master_dashboard.html -->
 {% extends 'game/base.html' %}
-
 {% block title %}Game Master Dashboard - ProjetA Murder Mystery{% endblock %}
-
 {% block content %}
-<div>
+<div class="container">
     <h2>Game Master Dashboard</h2>
     
-    <div>
-        <a href="{% url 'create_game' %}" class="button">Create New Game</a>
+    <div class="game-status">
+        {% if active_game %}
+            <div class="active-game-info">
+                <h3>Current Active Game</h3>
+                <p><strong>Status:</strong> {{ active_game.get_status_display }}</p>
+                <p><strong>Started:</strong> {{ active_game.created_at|date:"F j, Y, g:i a" }}</p>
+                <p><strong>Players:</strong> {{ active_game.player_count }}/{{ active_game.max_players }}</p>
+                
+                {% if active_game.status == 'waiting' %}
+                    <a href="{% url 'start_game' active_game.id %}" class="button">Start Game</a>
+                {% elif active_game.status == 'in_progress' %}
+                    <a href="{% url 'pause_game' active_game.id %}" class="button">Pause Game</a>
+                {% endif %}
+                <a href="{% url 'manage_game' active_game.id %}" class="button">Manage Game</a>
+                <a href="{% url 'end_game' active_game.id %}" class="button warning">End Game</a>
+            </div>
+        {% else %}
+            <div class="no-active-game">
+                <p>There is no active game at the moment.</p>
+                <a href="{% url 'launch_game' %}" class="button">Launch New Game</a>
+            </div>
+        {% endif %}
     </div>
     
-    <div>
-        <h3>Your Games</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Game Name</th>
-                    <th>Room Code</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Players</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Mystery Manor</td>
-                    <td>ABC123</td>
-                    <td>Waiting</td>
-                    <td>2023-04-12</td>
-                    <td>0/10</td>
-                    <td>
-                        <a href="#">Manage</a>
-                    </td>
-                </tr>
-                <!-- Game list will be populated dynamically -->
-            </tbody>
-        </table>
+    <div class="player-management">
+        <h3>Connected Players</h3>
+        {% if active_game and active_game.players.all %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Player Name</th>
+                        <th>Character</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for player in active_game.players.all %}
+                    <tr>
+                        <td>{{ player.name }}</td>
+                        <td>{{ player.character.name|default:"Not assigned" }}</td>
+                        <td>{{ player.status }}</td>
+                        <td>
+                            <a href="{% url 'message_player' player.id %}" class="button small">Message</a>
+                            <a href="{% url 'remove_player' player.id %}" class="button small warning">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No players connected.</p>
+        {% endif %}
     </div>
-    
-    <div>
-        <a href="{% url 'index' %}">Back to Home</a>
-        <a href="{% url 'player_logout' %}">Logout</a>
+   
+    <div class="dashboard-footer">
+        <a href="{% url 'index' %}" class="button">Back to Home</a>
+        <a href="{% url 'player_logout' %}" class="button">Logout</a>
     </div>
 </div>
 {% endblock %}

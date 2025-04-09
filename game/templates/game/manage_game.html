@@ -1,0 +1,266 @@
+<!-- game/templates/game/manage_game.html -->
+{% extends 'game/base.html' %}
+{% block title %}Manage Game - ProjetA Murder Mystery{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Game Management</h2>
+    
+    <div class="game-controls">
+        <h3>Game Controls</h3>
+        <div class="control-buttons">
+            {% if game.status == 'waiting' %}
+                <a href="{% url 'start_game' game.id %}" class="button">Start Game</a>
+            {% elif game.status == 'in_progress' %}
+                <a href="{% url 'pause_game' game.id %}" class="button">Pause Game</a>
+            {% elif game.status == 'paused' %}
+                <a href="{% url 'resume_game' game.id %}" class="button">Resume Game</a>
+            {% endif %}
+            <a href="{% url 'end_game' game.id %}" class="button warning">End Game</a>
+        </div>
+        
+        <div class="game-status">
+            <p><strong>Current Status:</strong> {{ game.get_status_display }}</p>
+            <p><strong>Started:</strong> {{ game.created_at|date:"F j, Y, g:i a" }}</p>
+            <p><strong>Players:</strong> {{ game.player_count }}/{{ game.max_players }}</p>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab-buttons">
+            <button class="tab-button active" data-tab="players">Players</button>
+            <button class="tab-button" data-tab="clues">Clues</button>
+            <button class="tab-button" data-tab="inquiries">Inquiries</button>
+            <button class="tab-button" data-tab="events">Game Events</button>
+        </div>
+        
+        <div class="tab-content active" id="players-tab">
+            <h3>Players</h3>
+            {% if game.players.all %}
+                <table class="player-table">
+                    <thead>
+                        <tr>
+                            <th>Player Name</th>
+                            <th>Character</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in game.players.all %}
+                        <tr>
+                            <td>{{ player.name }}</td>
+                            <td>
+                                {% if player.character %}
+                                    {{ player.character.name }}
+                                {% else %}
+                                    <form method="post" action="{% url 'assign_character' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="player_id" value="{{ player.id }}">
+                                        <select name="character_id">
+                                            <option value="">Select Character</option>
+                                            {% for character in available_characters %}
+                                                <option value="{{ character.id }}">{{ character.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <button type="submit" class="button small">Assign</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                            <td>{{ player.status }}</td>
+                            <td>
+                                <a href="{% url 'message_player' player.id %}" class="button small">Message</a>
+                                <a href="{% url 'remove_player' player.id %}" class="button small warning">Remove</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No players connected.</p>
+            {% endif %}
+        </div>
+        
+        <div class="tab-content" id="clues-tab">
+            <h3>Clues Management</h3>
+            <div class="send-clue-form">
+                <h4>Send New Clue</h4>
+                <form method="post" action="{% url 'send_clue' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Select Player:</label>
+                        <select name="player_id" required>
+                            <option value="">Select Player</option>
+                            {% for player in game.players.all %}
+                                <option value="{{ player.id }}">{{ player.name }} ({{ player.character.name|default:"No character" }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Clue Title:</label>
+                        <input type="text" name="clue_title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Clue Description:</label>
+                        <textarea name="clue_description" required></textarea>
+                    </div>
+                    <button type="submit" class="button">Send Clue</button>
+                </form>
+            </div>
+            
+            <div class="clue-history">
+                <h4>Sent Clues</h4>
+                {% if clues %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Player</th>
+                                <th>Clue Title</th>
+                                <th>Clue Text</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for player_clue in clues %}
+                            <tr>
+                                <td>{{ player_clue.received_at|date:"g:i a" }}</td>
+                                <td>{{ player_clue.player.name }}</td>
+                                <td>{{ player_clue.clue.title }}</td>
+                                <td>{{ player_clue.clue.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No clues have been sent yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="tab-content" id="inquiries-tab">
+            <h3>Player Inquiries</h3>
+            {% if inquiries %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Player</th>
+                            <th>Inquiry</th>
+                            <th>Response</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inquiry in inquiries %}
+                        <tr>
+                            <td>{{ inquiry.created_at|date:"g:i a" }}</td>
+                            <td>{{ inquiry.player.name }}</td>
+                            <td>{{ inquiry.text }}</td>
+                            <td>
+                                {% if inquiry.response %}
+                                    {{ inquiry.response }}
+                                {% else %}
+                                    <form method="post" action="{% url 'respond_to_inquiry' inquiry.id %}">
+                                        {% csrf_token %}
+                                        <textarea name="response" placeholder="Write a response..."></textarea>
+                                        <button type="submit" class="button small">Send</button>
+                                    </form>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not inquiry.response %}
+                                    <a href="{% url 'ignore_inquiry' inquiry.id %}" class="button small warning">Ignore</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No inquiries from players yet.</p>
+            {% endif %}
+        </div>
+        
+        <div class="tab-content" id="events-tab">
+            <h3>Game Events</h3>
+            <div class="create-event">
+                <h4>Create Game Event</h4>
+                <form method="post" action="{% url 'create_event' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label>Event Type:</label>
+                        <select name="event_type" required>
+                            <option value="announcement">Announcement (All Players)</option>
+                            <option value="event">Game Event (All Players)</option>
+                            <option value="revelation">Revelation (All Players)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Title:</label>
+                        <input type="text" name="event_title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Event Description:</label>
+                        <textarea name="event_description" required></textarea>
+                    </div>
+                    <button type="submit" class="button">Create Event</button>
+                </form>
+            </div>
+            
+            <div class="event-history">
+                <h4>Recent Events</h4>
+                {% if events %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Type</th>
+                                <th>Title</th>
+                                <th>Description</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td>{{ event.created_at|date:"g:i a" }}</td>
+                                <td>{{ event.get_event_type_display }}</td>
+                                <td>{{ event.title }}</td>
+                                <td>{{ event.description }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>No game events yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="management-footer">
+        <a href="{% url 'master_dashboard' %}" class="button">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    // Simple tab switching functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Show corresponding tab content
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(tabId + '-tab').classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}

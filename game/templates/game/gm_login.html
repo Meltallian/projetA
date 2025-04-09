@@ -1,9 +1,9 @@
-<!-- game/templates/game/login.html -->
+<!-- game/templates/game/gm_login.html -->
 {% extends 'game/base.html' %}
-{% block title %}Player Login - ProjetA Murder Mystery{% endblock %}
+{% block title %}Game Master Login - ProjetA Murder Mystery{% endblock %}
 {% block content %}
 <div class="container">
-    <h2>Player Login</h2>
+    <h2>Game Master Login</h2>
     
     {% if messages %}
         <div class="messages">
@@ -16,7 +16,7 @@
     <form method="post" class="login-form">
         {% csrf_token %}
         <div class="form-group">
-            <label for="name">Name:</label>
+            <label for="name">Game Master Name:</label>
             <input type="text" id="name" name="name" required>
         </div>
         <div class="form-group">

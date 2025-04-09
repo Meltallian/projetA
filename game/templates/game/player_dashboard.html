@@ -1,45 +1,87 @@
 <!-- game/templates/game/player_dashboard.html -->
 {% extends 'game/base.html' %}
-
 {% block title %}Player Dashboard - ProjetA Murder Mystery{% endblock %}
-
 {% block content %}
-<div>
-    <h2>Player Dashboard</h2>
+<div class="container">
+    <h2>Welcome, {{ player.name }}</h2>
     
-    <div>
-        <a href="{% url 'join_game' %}" class="button">Join a Game</a>
-    </div>
-    
-    <div>
-        <h3>Your Active Games</h3>
-        <div id="active-games">
-            <div class="game-card">
-                <h4>Mystery Manor</h4>
-                <p>Status: Waiting for players</p>
-                <p>Character: Detective Smith</p>
-                <a href="#" class="button">Enter Game</a>
+    {% if active_game %}
+        {% if active_game.status == 'waiting' %}
+            <div class="waiting-room">
+                <h3>Game is Ready!</h3>
+                <p>The game master is preparing to start the mystery. Please wait...</p>
+                
+                {% if player.character %}
+                    <div class="character-info">
+                        <h4>Your Character: {{ player.character.name }}</h4>
+                        <p>{{ player.character.description }}</p>
+                    </div>
+                {% else %}
+                    <p>You will be assigned a character when the game begins.</p>
+                {% endif %}
+                
+                <p class="status-message">Status: Waiting for game master to start</p>
             </div>
-            <!-- Game list will be populated dynamically -->
-        </div>
-    </div>
-    
-    <div>
-        <h3>Past Games</h3>
-        <div id="past-games">
-            <div class="game-card">
-                <h4>The Haunted Mansion</h4>
-                <p>Status: Completed</p>
-                <p>Character: The Butler</p>
-                <p>Result: You solved the mystery!</p>
+        {% elif active_game.status == 'in_progress' %}
+            <div class="game-in-progress">
+                {% if player.character %}
+                    <div class="character-info">
+                        <h3>Your Character: {{ player.character.name }}</h3>
+                        <p>{{ player.character.description }}</p>
+                    </div>
+                    
+                    <div class="clues-section">
+                        <h3>Your Clues</h3>
+                        <div class="clue-list">
+                            {% for player_clue in player.playerclue_set.all %}
+                                <div class="clue-card">
+                                    <h4>{{ player_clue.clue.title }}</h4>
+                                    <p>{{ player_clue.clue.description }}</p>
+                                    <p class="clue-timestamp">Received: {{ player_clue.received_at|date:"g:i a" }}</p>
+                                </div>
+                            {% empty %}
+                                <p>You haven't received any clues yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="inquiry-section">
+                        <h3>Make an Inquiry</h3>
+                        <form method="post" action="{% url 'submit_inquiry' %}">
+                            {% csrf_token %}
+                            <textarea name="inquiry_text" placeholder="Ask a question about the mystery..."></textarea>
+                            <button type="submit" class="button">Submit Inquiry</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <p>Waiting for character assignment...</p>
+                {% endif %}
             </div>
-            <!-- Game list will be populated dynamically -->
+        {% elif active_game.status == 'paused' %}
+            <div class="game-paused">
+                <h3>Game Paused</h3>
+                <p>The game master has temporarily paused the game. Please wait for it to resume.</p>
+            </div>
+        {% elif active_game.status == 'completed' %}
+            <div class="game-completed">
+                <h3>Game Completed</h3>
+                <p>This murder mystery has been solved!</p>
+                <div class="solution-reveal">
+                    <h4>The Solution</h4>
+                    <p>{{ active_game.solution }}</p>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="no-active-game">
+            <h3>No Active Game</h3>
+            <p>There is no active game at the moment. Please check back later or contact the game master.</p>
         </div>
-    </div>
+    {% endif %}
     
-    <div>
-        <a href="{% url 'index' %}">Back to Home</a>
-        <a href="{% url 'player_logout' %}">Logout</a>
+    <div class="dashboard-footer">
+        <a href="{% url 'index' %}" class="button">Back to Home</a>
+        <a href="{% url 'player_logout' %}" class="button">Logout</a>
     </div>
 </div>
 {% endblock %}

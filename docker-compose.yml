@@ -14,8 +14,6 @@ services:
     command: >
       bash -c "
         python manage.py collectstatic --noinput &&
-        python manage.py migrate &&
-        python manage.py ensure_default_users &&
         daphne -b 0.0.0.0 -p 8000 projetA.asgi:application
       "    
     volumes:
