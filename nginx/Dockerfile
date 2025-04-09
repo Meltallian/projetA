@@ -1,4 +1,4 @@
-FROM nginx:1.24
+FROM nginx:1.26.3
 
 # Install OpenSSL
 RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*

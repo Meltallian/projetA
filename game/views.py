@@ -146,31 +146,31 @@ def register_players(request, game_id):
     # Placeholder implementation
     return render(request, 'game/register_players.html')
 
-
-def ensure_default_users_exist():
-    """Make sure the default game master and test players exist"""
-    from game.models import PlayerProfile
+#Obsolete
+# def ensure_default_users_exist():
+#     """Make sure the default game master and test players exist"""
+#     from game.models import PlayerProfile
     
-    # Create the default game master if it doesn't exist
-    PlayerProfile.objects.get_or_create(
-        name="gm",
-        verification_code="1234",
-        defaults={
-            'is_game_master': True,
-            'games_played': 0,
-        }
-    )
+#     # Create the default game master if it doesn't exist
+#     PlayerProfile.objects.get_or_create(
+#         name="gm",
+#         verification_code="1234",
+#         defaults={
+#             'is_game_master': True,
+#             'games_played': 0,
+#         }
+#     )
     
-    # Create 10 test players
-    for i in range(1, 11):
-        player_name = f"p{i}"
-        code = f"{i}"  # Formats as 4-digit number with leading zeros
+#     # Create 10 test players
+#     for i in range(1, 11):
+#         player_name = f"p{i}"
+#         code = f"{i}"  # Formats as 4-digit number with leading zeros
         
-        PlayerProfile.objects.get_or_create(
-            name=player_name,
-            verification_code=code,
-            defaults={
-                'is_game_master': False,
-                'games_played': 0,
-            }
-        )
+#         PlayerProfile.objects.get_or_create(
+#             name=player_name,
+#             verification_code=code,
+#             defaults={
+#                 'is_game_master': False,
+#                 'games_played': 0,
+#             }
+#         )

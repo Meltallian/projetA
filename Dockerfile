@@ -2,13 +2,17 @@ FROM python:3.9
 
 WORKDIR /code
 
-# Install dependencies
-COPY requirements.txt /code/
-RUN pip install -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . /code/
+# Install postgres client for health check
+RUN apt-get update && apt-get install -y postgresql-client
 
-# Prepare static files directory but don't run collectstatic during build
-# (we'll do this after the container starts)
-RUN mkdir -p /code/staticfiles /code/media
+# Add a healthcheck script
+COPY wait-for-postgres.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/wait-for-postgres.sh
+
+COPY . .
+
+# Use the healthcheck script as an entrypoint
+ENTRYPOINT ["/usr/local/bin/wait-for-postgres.sh"]

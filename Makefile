@@ -13,44 +13,44 @@ help:
 	@echo "  make clean           - Remove all containers, volumes, and images"
 
 up:
-	sudo docker compose -f docker-compose.new.yml up -d
+	sudo docker compose up -d
 
 detach:
-	sudo docker compose -f docker-compose.new.yml up
+	sudo docker compose up
 
 down:
-	sudo docker compose -f docker-compose.new.yml down
+	sudo docker compose down
 
 build:
-	sudo docker compose -f docker-compose.new.yml build
+	sudo docker compose build
 
 logs:
-	sudo docker compose -f docker-compose.new.yml logs -f
+	sudo docker compose logs -f
 
 shell:
-	sudo docker compose -f docker-compose.new.yml exec web /bin/bash
+	sudo docker compose exec web /bin/bash
 
 mig:
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py makemigrations
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py migrate
+	sudo docker compose exec web python manage.py makemigrations
+	sudo docker compose exec web python manage.py migrate
 
 migrate:
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py migrate
+	sudo docker compose exec web python manage.py migrate
 
 super:
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py createsuperuser
+	sudo docker compose exec web python manage.py createsuperuser
 
 clean:
-	sudo docker compose -f docker-compose.new.yml down -v --rmi all --remove-orphans
+	sudo docker compose down -v --rmi all --remove-orphans
 
 test:
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py test
+	sudo docker compose exec web python manage.py test
 
 collectstatic:
-	sudo docker compose -f docker-compose.new.yml exec web python manage.py collectstatic --noinput
+	sudo docker compose exec web python manage.py collectstatic --noinput
 
 restart:
-	sudo docker compose -f docker-compose.new.yml restart
+	sudo docker compose restart
 
 ps:
-	sudo docker compose -f docker-compose.new.yml ps
+	sudo docker compose ps
