@@ -13,7 +13,6 @@ services:
     build: .
     command: >
       bash -c "
-        python manage.py collectstatic --noinput &&
         daphne -b 0.0.0.0 -p 8000 projetA.asgi:application
       "    
     volumes:

@@ -14,18 +14,28 @@ help:
 
 up:
 	sudo docker compose up -d
+	sudo docker compose exec web python manage.py collectstatic --noinput
 	sudo docker compose exec web python manage.py makemigrations
 	sudo docker compose exec web python manage.py migrate
 	sudo docker compose exec web python manage.py ensure_default_users
 
 detach:
 	sudo docker compose up
+	sudo docker compose exec web python manage.py collectstatic --noinput
 	sudo docker compose exec web python manage.py makemigrations
 	sudo docker compose exec web python manage.py migrate
 	sudo docker compose exec web python manage.py ensure_default_users
 
 down:
 	sudo docker compose down
+
+re:
+	sudo docker compose down -v --rmi all --remove-orphans
+	sudo docker compose up -d
+	sudo docker compose exec web python manage.py collectstatic --noinput
+	sudo docker compose exec web python manage.py makemigrations
+	sudo docker compose exec web python manage.py migrate
+	sudo docker compose exec web python manage.py ensure_default_users	
 
 build:
 	sudo docker compose build
@@ -37,6 +47,7 @@ shell:
 	sudo docker compose exec web /bin/bash
 
 mig:
+	sudo docker compose exec web python manage.py collectstatic --noinput
 	sudo docker compose exec web python manage.py makemigrations
 	sudo docker compose exec web python manage.py migrate
 	sudo docker compose exec web python manage.py ensure_default_users
