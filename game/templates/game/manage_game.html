@@ -16,18 +16,21 @@
         
         <div class="game-controls">
             <div class="control-button">
-                <form method="post" action="{% url 'pause_game' %}">
-                    {% csrf_token %}
-                    {% if game.status == 'paused' %}
+                {% if game.status == 'paused' %}
+                    <form method="post" action="{% url 'resume_game' game.id %}">
+                        {% csrf_token %}
                         <button type="submit" class="button">Resume Game</button>
-                    {% else %}
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'pause_game' game.id %}">
+                        {% csrf_token %}
                         <button type="submit" class="button">Pause Game</button>
-                    {% endif %}
-                </form>
+                    </form>
+                {% endif %}
             </div>
             
             <div class="control-button">
-                <form method="post" action="{% url 'end_game' %}" onsubmit="return confirm('Are you sure you want to end the game? This cannot be undone.');">
+                <form method="post" action="{% url 'end_game' game.id %}" onsubmit="return confirm('Are you sure you want to end the game? This cannot be undone.');">
                     {% csrf_token %}
                     <button type="submit" class="button warning">End Game</button>
                 </form>
@@ -39,7 +42,7 @@
             <h4>Game Progression</h4>
             <p>Advancing to a new step will make additional clues available to players.</p>
             
-            <form method="post" action="{% url 'set_game_step' %}">
+            <form method="post" action="{% url 'set_step' game.id %}">
                 {% csrf_token %}
                 <div class="step-buttons">
                     {% for step_id, step_name in game.STEP_CHOICES %}
