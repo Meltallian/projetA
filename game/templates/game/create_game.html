@@ -1,11 +1,11 @@
 <!-- game/templates/game/create_game.html -->
 {% extends 'game/base.html' %}
 
-{% block title %}Create Game - ProjetA Murder Mystery{% endblock %}
+{% block title %}Create Game - The Enchanted Forest{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h2>Create New Game</h2>
+    <h2>Create and Start New Game</h2>
     
     {% if messages %}
         <div class="messages">
@@ -19,42 +19,42 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="name">Game Name:</label>
-            <input type="text" id="name" name="name" required value="Mystery Manor">
+            <input type="text" id="name" name="name" required value="The Crystal of Whispering Woods">
             <small>This will be visible to all players</small>
         </div>
         
-        <div class="form-group">
-            <label for="scenario">Game Scenario:</label>
-            <select id="scenario" name="scenario" required>
-                <option value="mansion_murder">Mansion Murder</option>
-                <option value="cruise_crime">Cruise Ship Crime</option>
-                <option value="hotel_homicide">Hotel Homicide</option>
-            </select>
-            <small>Choose the scenario for this game session</small>
+        <div class="form-section">
+            <h3>Game Scenario: The Enchanted Forest</h3>
+            <p>Deep within the Whispering Woods, a powerful magical crystal has been stolen from the Ancient Oak. 
+               The forest's balance has been disturbed, and dark magic is spreading through the realm. 
+               Various magical beings have gathered to solve the mystery and restore harmony to the forest.</p>
         </div>
         
         <div class="form-section">
             <h3>Characters</h3>
-            <p>This game will include the following 8 characters:</p>
+            <p>This game will include the following 10 characters:</p>
             <ol class="character-list">
-                <li>The Butler - The loyal servant with access to every room in the mansion</li>
-                <li>The Heiress - Daughter of the wealthy family with financial troubles</li>
-                <li>The Detective - A brilliant but troubled investigator with a dark past</li>
-                <li>The Chef - Hot-tempered culinary genius who knows poisonous ingredients</li>
-                <li>The Maid - Quiet observer who knows everyone's secrets</li>
-                <li>The Business Partner - Ambitious associate with questionable ethics</li>
-                <li>The Doctor - Family physician with medical expertise and personal connections</li>
-                <li>The Visitor - Mysterious guest with an unknown agenda</li>
+                <li>White Mage - A powerful healer and protector with knowledge of ancient healing arts</li>
+                <li>Green Mage - A nature-focused mage who can commune with plants and animals of the forest</li>
+                <li>Magenta Sorcerer - A mysterious spellcaster with unique magenta-colored magic and unknown origins</li>
+                <li>Forest Fairy - A mischievous and ancient fairy with deep connections to the heart of the forest</li>
+                <li>Druid - A wise guardian of nature's balance who can shape-shift into various animals</li>
+                <li>Centaur - A half-human, half-horse being with extensive knowledge of the forest's geography</li>
+                <li>Wood Nymph - A forest spirit bound to the trees, with the ability to move unseen through the woods</li>
+                <li>Magic Merchant - A traveling trader of magical items and collector of rare artifacts and stories</li>
+                <li>Mysterious Wanderer - A cloaked figure who appears and disappears at will, with cryptic knowledge</li>
+                <li>Elementalist - A powerful magic user who can control the elements of nature - earth, air, fire, and water</li>
             </ol>
         </div>
         
         <div class="form-group">
             <label for="solution">Game Solution:</label>
-            <textarea id="solution" name="solution" rows="3" required>The butler committed the crime after discovering the family's dark secret.</textarea>
+            <textarea id="solution" name="solution" rows="3" required>The Mysterious Wanderer stole the crystal to harness its power and open a portal to the shadow realm.</textarea>
             <small>This will be revealed at the end of the game</small>
         </div>
         
-        <button type="submit" class="button">Create Game</button>
+        <button type="submit" class="button">Create and Start Game</button>
+        <p class="note"><small>The game will start immediately after creation, and you'll be taken to the game management screen.</small></p>
     </form>
     
     <div class="launch-footer">

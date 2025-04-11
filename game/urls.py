@@ -24,6 +24,10 @@ urlpatterns = [
     path('gm/game/<int:game_id>/pause/', views.pause_game, name='pause_game'),
     path('gm/game/<int:game_id>/resume/', views.resume_game, name='resume_game'),
     path('gm/game/<int:game_id>/end/', views.end_game, name='end_game'),
+    
+    # Game step controls (new)
+    path('gm/game/<int:game_id>/advance-step/', views.advance_step, name='advance_step'),
+    path('gm/game/<int:game_id>/set-step/', views.set_step, name='set_step'),
    
     # Game Master actions
     path('gm/assign-character/', views.assign_character, name='assign_character'),
@@ -31,7 +35,6 @@ urlpatterns = [
     path('gm/inquiry/<int:inquiry_id>/respond/', views.respond_to_inquiry, name='respond_to_inquiry'),
     path('gm/inquiry/<int:inquiry_id>/ignore/', views.ignore_inquiry, name='ignore_inquiry'),
     path('gm/create-event/', views.create_event, name='create_event'),
-    path('gm/player/<int:player_id>/message/', views.message_player, name='message_player'),
     path('gm/player/<int:player_id>/remove/', views.remove_player, name='remove_player'),
    
     # Legacy routes - redirected to new patterns

@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}ProjetA Murder Mystery{% endblock %}</title>
+    <title>{% block title %}The Enchanted Forest Mystery{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/game.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -103,13 +104,177 @@
             margin-bottom: 15px; 
             border-radius: 4px;
         }
+        
+        /* Disabled section styling */
+        .inquiry-section.disabled {
+            background-color: #f2f2f2;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            opacity: 0.8;
+        }
+        
+        .inquiry-section.disabled h3 {
+            color: #777;
+        }
+        
+        .inquiry-section.disabled p {
+            color: #777;
+            font-style: italic;
+        }
+        
+        /* Paused game styling */
+        .paused-message {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .paused-message p {
+            margin: 0;
+        }
+        
+        /* Game controls */
+        .game-container .game-controls {
+            display: flex;
+            align-items: center;
+        }
+        
+        .game-container .left-controls {
+            margin-right: 20px;
+        }
+        
+        .game-container .game-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: linear-gradient(to right, #2c3e50, #4a6491);
+            border-radius: 8px 8px 0 0;
+            color: var(--light-text);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .game-container .game-header h2 {
+            margin: 0;
+            flex-grow: 1;
+            text-align: center;
+            font-size: 1.8rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+        }
+        
+        .game-container .left-controls {
+            margin-right: 20px;
+        }
+        
+        .game-container .player-badge {
+            background-color: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        #refresh-button {
+            background-color: #4a6491;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 16px;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        #refresh-button i {
+            margin-right: 5px;
+        }
+        
+        #refresh-button:hover {
+            background-color: #5a7cb3;
+            transform: scale(1.05);
+        }
+        
+        /* Game master controls (preserve original styling) */
+        .container .game-controls {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .container .control-buttons {
+            margin-bottom: 15px;
+        }
+        
+        .container .game-controls h3 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* Game notifications */
+        .game-notification {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            width: 350px;
+            background-color: #fff;
+            border-left: 5px solid var(--accent-color);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 4px;
+            padding: 15px;
+            z-index: 1000;
+            transition: right 0.3s ease-in-out;
+        }
+        
+        .game-notification.show {
+            right: 20px;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .notification-header h4 {
+            margin: 0;
+            color: var(--accent-color);
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+        
+        .close-btn:hover {
+            color: #555;
+        }
     </style>
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>ProjetA Murder Mystery</h1>
+            <h1>The Enchanted Forest Mystery</h1>
             {% if request.profile %}
                 <div style="float: right; margin-top: -30px; color: var(--light-text);">
                     Logged in as: {{ request.profile.name }}
@@ -135,7 +300,7 @@
         </main>
        
         <footer>
-            <p>ProjetA Murder Mystery Game © 2025</p>
+            <p>The Enchanted Forest Mystery Game © 2025</p>
         </footer>
     </div>
    

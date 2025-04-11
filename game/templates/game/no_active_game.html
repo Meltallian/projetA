@@ -1,32 +1,16 @@
 <!-- game/templates/game/no_active_game.html -->
 {% extends 'game/base.html' %}
-{% block title %}No Active Game - ProjetA Murder Mystery{% endblock %}
+{% block title %}No Active Game - The Enchanted Forest Mystery{% endblock %}
 {% block content %}
-<div class="container no-game">
-    <h2>No Active Game</h2>
-    
+<div class="container">
     <div class="no-game-message">
-        <div class="status-icon error"></div>
-        <h3>There is no active murder mystery game at the moment</h3>
-        <p>The Game Master hasn't launched a game yet. Please check back later.</p>
-    </div>
-    
-    <div class="player-info">
-        <h3>Hello, {{ player.name }}</h3>
-        <p>You are logged in and ready to play when a game becomes available.</p>
-        <p>When the Game Master launches a new game, you will automatically be able to join.</p>
-    </div>
-    
-    <div class="refresh-section">
-        <p>Checking for games automatically every 30 seconds...</p>
-        <div class="progress-bar">
-            <div class="progress"></div>
+        <div class="refresh-status">
+            <div class="progress-container"><div class="progress"></div></div>
+            <button id="refresh-button" class="button">Check Now</button>
         </div>
-        <button id="refresh-button" class="button">Check Now</button>
-    </div>
-    
-    <div class="no-game-footer">
-        <a href="{% url 'player_logout' %}" class="button">Logout</a>
+        <h3>There is no active forest adventure at the moment</h3>
+        <p>Please wait for a Game Master to create and start a new adventure.</p>
+        <p>This page will automatically check for new games every 30 seconds.</p>
     </div>
 </div>
 

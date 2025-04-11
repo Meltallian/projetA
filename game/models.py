@@ -25,16 +25,22 @@ class GameSession(models.Model):
     ]
     
     SCENARIO_CHOICES = [
-        ('mansion_murder', 'Mansion Murder'),
-        ('cruise_crime', 'Cruise Ship Crime'),
-        ('hotel_homicide', 'Hotel Homicide'),
+        ('enchanted_forest', 'The Enchanted Forest'),
+    ]
+    
+    STEP_CHOICES = [
+        (1, 'Step 1 - Initial Clues'),
+        (2, 'Step 2 - More Clues'),
+        (3, 'Step 3 - Final Clues'),
+        (4, 'Epilogue - Resolution'),
     ]
     
     name = models.CharField(max_length=100)
     game_master = models.OneToOneField(PlayerProfile, on_delete=models.CASCADE, related_name='current_game_session')
-    scenario = models.CharField(max_length=50, choices=SCENARIO_CHOICES, default='mansion_murder')
+    scenario = models.CharField(max_length=50, choices=SCENARIO_CHOICES, default='enchanted_forest')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
-    max_players = models.IntegerField(default=8)
+    step = models.IntegerField(choices=STEP_CHOICES, default=1)
+    max_players = models.IntegerField(default=10)
     solution = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
@@ -48,6 +54,13 @@ class GameSession(models.Model):
         return self.players.count()
     
     @property
+    def step_display(self):
+        for step_id, step_name in self.STEP_CHOICES:
+            if step_id == self.step:
+                return step_name
+        return "Unknown Step"
+    
+    @property
     def duration(self):
         """Return the duration of the game in minutes"""
         if not self.started_at:
@@ -58,7 +71,7 @@ class GameSession(models.Model):
         return int(delta.total_seconds() / 60)
 
 class Character(models.Model):
-    """Character in a murder mystery game"""
+    """Character in the enchanted forest mystery game"""
     game = models.ForeignKey(GameSession, on_delete=models.CASCADE, related_name='characters')
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -91,6 +104,8 @@ class Clue(models.Model):
     game = models.ForeignKey(GameSession, on_delete=models.CASCADE, related_name='clues')
     title = models.CharField(max_length=100)
     description = models.TextField()
+    step = models.IntegerField(choices=GameSession.STEP_CHOICES, default=1, 
+                              help_text="The game step when this clue becomes available")
     
     def __str__(self):
         return self.title

@@ -13,13 +13,25 @@
                 <p><strong>Started:</strong> {{ active_game.created_at|date:"F j, Y, g:i a" }}</p>
                 <p><strong>Players:</strong> {{ active_game.player_count }}/{{ active_game.max_players }}</p>
                 
-                {% if active_game.status == 'waiting' %}
-                    <a href="{% url 'start_game' active_game.id %}" class="button">Start Game</a>
-                {% elif active_game.status == 'in_progress' %}
-                    <a href="{% url 'pause_game' active_game.id %}" class="button">Pause Game</a>
+                {% if active_game.status == 'in_progress' %}
+                    <form method="post" action="{% url 'pause_game' active_game.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="button">Pause Game</button>
+                    </form>
+                    <a href="{% url 'manage_game' active_game.id %}" class="button">Manage Game</a>
+                {% elif active_game.status == 'paused' %}
+                    <form method="post" action="{% url 'resume_game' active_game.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="button">Resume Game</button>
+                    </form>
+                    <a href="{% url 'manage_game' active_game.id %}" class="button">Manage Game</a>
+                {% elif active_game.status == 'completed' %}
+                    <a href="{% url 'manage_game' active_game.id %}" class="button">View Game</a>
                 {% endif %}
-                <a href="{% url 'manage_game' active_game.id %}" class="button">Manage Game</a>
-                <a href="{% url 'end_game' active_game.id %}" class="button warning">End Game</a>
+                <form method="post" action="{% url 'end_game' active_game.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button warning">End Game</button>
+                </form>
             </div>
         {% else %}
             <div class="no-active-game">
@@ -48,8 +60,10 @@
                         <td>{{ player.character.name|default:"Not assigned" }}</td>
                         <td>{{ player.status }}</td>
                         <td>
-                            <a href="{% url 'message_player' player.id %}" class="button small">Message</a>
-                            <a href="{% url 'remove_player' player.id %}" class="button small warning">Remove</a>
+                            <form method="post" action="{% url 'remove_player' player.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="button small warning">Remove</button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

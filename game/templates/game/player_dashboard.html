@@ -1,6 +1,6 @@
 <!-- game/templates/game/player_dashboard.html -->
 {% extends 'game/base.html' %}
-{% block title %}Player Dashboard - ProjetA Murder Mystery{% endblock %}
+{% block title %}Player Dashboard - The Enchanted Forest Mystery{% endblock %}
 {% block content %}
 <div class="container">
     <h2>Welcome, {{ player.name }}</h2>
@@ -61,11 +61,39 @@
             <div class="game-paused">
                 <h3>Game Paused</h3>
                 <p>The game master has temporarily paused the game. Please wait for it to resume.</p>
+                {% if player.character %}
+                    <div class="character-info">
+                        <h3>Your Character: {{ player.character.name }}</h3>
+                        <p>{{ player.character.description }}</p>
+                    </div>
+                    
+                    <div class="clues-section">
+                        <h3>Your Clues</h3>
+                        <div class="clue-list">
+                            {% for player_clue in player.playerclue_set.all %}
+                                <div class="clue-card">
+                                    <h4>{{ player_clue.clue.title }}</h4>
+                                    <p>{{ player_clue.clue.description }}</p>
+                                    <p class="clue-timestamp">Received: {{ player_clue.received_at|date:"g:i a" }}</p>
+                                </div>
+                            {% empty %}
+                                <p>You haven't received any clues yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="inquiry-section disabled">
+                        <h3>Inquiries Disabled</h3>
+                        <p>The game is currently paused. You cannot submit inquiries until the game is resumed.</p>
+                    </div>
+                {% else %}
+                    <p>Waiting for character assignment...</p>
+                {% endif %}
             </div>
         {% elif active_game.status == 'completed' %}
             <div class="game-completed">
-                <h3>Game Completed</h3>
-                <p>This murder mystery has been solved!</p>
+                <h3>Adventure Completed</h3>
+                <p>The forest mystery has been solved!</p>
                 <div class="solution-reveal">
                     <h4>The Solution</h4>
                     <p>{{ active_game.solution }}</p>
@@ -80,7 +108,6 @@
     {% endif %}
     
     <div class="dashboard-footer">
-        <a href="{% url 'index' %}" class="button">Back to Home</a>
         <a href="{% url 'player_logout' %}" class="button">Logout</a>
     </div>
 </div>

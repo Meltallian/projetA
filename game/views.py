@@ -39,7 +39,7 @@ def get_active_game():
 
 # View functions
 def index(request):
-    """Landing page for the murder mystery game app"""
+    """Landing page for the enchanted forest mystery game"""
     # Check if already logged in
     profile = get_profile_from_session(request)
     if profile:
@@ -145,7 +145,12 @@ def player_dashboard(request):
     
     # If game is in progress or paused, show game view
     if active_game.status in ['in_progress', 'paused']:
-        player_clues = PlayerClue.objects.filter(player=player).order_by('-received_at')
+        # Get clues available at the current game step
+        player_clues = PlayerClue.objects.filter(
+            player=player,
+            clue__step__lte=active_game.step  # Only show clues for current and previous steps
+        ).order_by('-received_at')
+        
         game_events = GameEvent.objects.filter(game=active_game).order_by('-created_at')
         player_inquiries = Inquiry.objects.filter(player=player).order_by('-created_at')
         
@@ -207,29 +212,33 @@ def create_game(request):
                 return redirect('master_dashboard')
             
             with transaction.atomic():
-                # Create the game with fixed 8 players
+                # Create the game with fixed 10 players and start it immediately
                 game = GameSession.objects.create(
-                    name=request.POST.get('name', 'New Game'),
+                    name=request.POST.get('name', 'The Crystal of Whispering Woods'),
                     game_master=profile,
-                    scenario=request.POST.get('scenario', 'mansion_murder'),
-                    max_players=8,  # Fixed to 8 players
-                    solution=request.POST.get('solution', '')
+                    scenario='enchanted_forest',  # Always use enchanted_forest scenario
+                    max_players=10,  # Fixed to 10 players
+                    solution=request.POST.get('solution', ''),
+                    status='in_progress',  # Automatically set to in_progress
+                    started_at=timezone.now()  # Set the start time
                 )
                 
                 # Update game master's current game
                 profile.current_game = game
                 profile.save(update_fields=['current_game'])
                 
-                # Create the 8 predefined characters
+                # Create the 10 predefined characters
                 predefined_characters = [
-                    {"name": "The Butler", "description": "The loyal servant with access to every room in the mansion"},
-                    {"name": "The Heiress", "description": "Daughter of the wealthy family with financial troubles"},
-                    {"name": "The Detective", "description": "A brilliant but troubled investigator with a dark past"},
-                    {"name": "The Chef", "description": "Hot-tempered culinary genius who knows poisonous ingredients"},
-                    {"name": "The Maid", "description": "Quiet observer who knows everyone's secrets"},
-                    {"name": "The Business Partner", "description": "Ambitious associate with questionable ethics"},
-                    {"name": "The Doctor", "description": "Family physician with medical expertise and personal connections"},
-                    {"name": "The Visitor", "description": "Mysterious guest with an unknown agenda"}
+                    {"name": "White Mage", "description": "A powerful healer and protector with knowledge of ancient healing arts."},
+                    {"name": "Green Mage", "description": "A nature-focused mage who can commune with plants and animals of the forest."},
+                    {"name": "Magenta Sorcerer", "description": "A mysterious spellcaster with unique magenta-colored magic and unknown origins."},
+                    {"name": "Forest Fairy", "description": "A mischievous and ancient fairy with deep connections to the heart of the forest."},
+                    {"name": "Druid", "description": "A wise guardian of nature's balance who can shape-shift into various animals."},
+                    {"name": "Centaur", "description": "A half-human, half-horse being with extensive knowledge of the forest's geography."},
+                    {"name": "Wood Nymph", "description": "A forest spirit bound to the trees, with the ability to move unseen through the woods."},
+                    {"name": "Magic Merchant", "description": "A traveling trader of magical items and collector of rare artifacts and stories."},
+                    {"name": "Mysterious Wanderer", "description": "A cloaked figure who appears and disappears at will, with cryptic knowledge."},
+                    {"name": "Elementalist", "description": "A powerful magic user who can control the elements of nature - earth, air, fire, and water."}
                 ]
                 
                 for character_data in predefined_characters:
@@ -239,8 +248,18 @@ def create_game(request):
                         description=character_data["description"]
                     )
                 
-                logger.info(f"Game Master {profile.name} created new game {game.id}")
-                messages.success(request, f"Game '{game.name}' has been created with 8 characters!")
+                # Create a game event announcing the start
+                GameEvent.objects.create(
+                    game=game,
+                    event_type='announcement',
+                    title='Adventure Begins',
+                    description='The enchanted forest calls for your help! A powerful artifact has been stolen, and dark magic threatens the harmony of the woods. Gather information and discover who is behind this plot!'
+                )
+                
+                logger.info(f"Game Master {profile.name} created and started new game {game.id}")
+                messages.success(request, f"Game '{game.name}' has been created and started with 10 fantasy characters!")
+                
+                # Redirect directly to manage_game
                 return redirect('manage_game', game_id=game.id)
                 
         except Exception as e:
@@ -280,8 +299,8 @@ def end_game(request, game_id):
             GameEvent.objects.create(
                 game=game,
                 event_type='revelation',
-                title='Mystery Solved!',
-                description=f'The mystery has been solved! {game.solution}'
+                title='The Mystery of the Forest Solved!',
+                description=f'The quest has reached its conclusion! {game.solution}'
             )
             
             logger.info(f"Game {game.id} ended by GM {profile.name}")
@@ -307,6 +326,11 @@ def manage_game(request, game_id):
     # Check if this game master owns this game
     if game.game_master != profile:
         return HttpResponseForbidden("You don't have permission to manage this game")
+    
+    # Redirect to dashboard if the game hasn't started
+    if game.status == 'waiting':
+        messages.warning(request, "You need to start the game before you can manage it.")
+        return redirect('master_dashboard')
     
     # Get available characters (not assigned to any player)
     available_characters = Character.objects.filter(game=game).exclude(
@@ -350,7 +374,7 @@ def start_game(request, game_id):
         messages.warning(request, "Game is not in waiting status and cannot be started.")
         return redirect('manage_game', game_id=game_id)
     
-    # Start the game
+    # Start the game (no player check required)
     game.status = 'in_progress'
     game.started_at = timezone.now()
     game.save()
@@ -359,15 +383,21 @@ def start_game(request, game_id):
     GameEvent.objects.create(
         game=game,
         event_type='announcement',
-        title='Game Started',
-        description='The murder mystery has begun! Investigate carefully and solve the mystery.'
+        title='Adventure Begins',
+        description='The enchanted forest calls for your help! A powerful artifact has been stolen, and dark magic threatens the harmony of the woods. Gather information and discover who is behind this plot!'
     )
     
-    logger.info(f"Game {game.id} started by GM {profile.name}")
-    messages.success(request, "Game started successfully!")
+    connected_players = game.players.count()
+    logger.info(f"Game {game.id} started by GM {profile.name} with {connected_players} connected players")
+    
+    if connected_players == 0:
+        messages.info(request, "Game started with no players connected. Players can join at any time.")
+    else:
+        messages.success(request, f"Game started successfully with {connected_players} players!")
     
     # TODO: Send WebSocket notification to all players
     
+    # Redirect to manage_game instead of the dashboard
     return redirect('manage_game', game_id=game_id)
 
 @require_POST
@@ -393,11 +423,11 @@ def pause_game(request, game_id):
         game=game,
         event_type='announcement',
         title='Game Paused',
-        description='The game has been temporarily paused by the Game Master.'
+        description='The game has been temporarily paused by the Game Master. Inquiries are disabled until the game is resumed.'
     )
     
     logger.info(f"Game {game.id} paused by GM {profile.name}")
-    messages.success(request, "Game paused successfully!")
+    messages.success(request, "Game paused successfully! Player inquiries are now disabled.")
     
     # TODO: WebSocket notification
     
@@ -426,11 +456,11 @@ def resume_game(request, game_id):
         game=game,
         event_type='announcement',
         title='Game Resumed',
-        description='The game has been resumed by the Game Master. Continue investigating!'
+        description='The game has been resumed by the Game Master. Continue investigating! Inquiries are now enabled again.'
     )
     
     logger.info(f"Game {game.id} resumed by GM {profile.name}")
-    messages.success(request, "Game resumed successfully!")
+    messages.success(request, "Game resumed successfully! Player inquiries are now enabled.")
     
     # TODO: WebSocket notification
     
@@ -480,18 +510,21 @@ def send_clue(request):
     player_id = request.POST.get('player_id')
     clue_title = request.POST.get('clue_title')
     clue_description = request.POST.get('clue_description')
+    clue_step = int(request.POST.get('clue_step', 1))  # Default to step 1
     
     if not all([player_id, clue_title, clue_description]):
         return JsonResponse({'success': False, 'error': 'Missing required fields'}, status=400)
     
     try:
         player = Player.objects.get(id=player_id)
+        game = player.game
         
-        # Create clue
+        # Create clue with step information
         clue = Clue.objects.create(
-            game=player.game,
+            game=game,
             title=clue_title,
-            description=clue_description
+            description=clue_description,
+            step=clue_step
         )
         
         # Assign to player
@@ -501,7 +534,7 @@ def send_clue(request):
             received_at=timezone.now()
         )
         
-        logger.info(f"Clue '{clue_title}' sent to player {player.name}")
+        logger.info(f"Clue '{clue_title}' (Step {clue_step}) sent to player {player.name}")
         
         # TODO: WebSocket notification
         
@@ -525,6 +558,14 @@ def submit_inquiry(request):
     active_game = get_active_game()
     if not active_game:
         return JsonResponse({'success': False, 'error': 'No active game'}, status=400)
+    
+    # Check if game is paused - reject inquiries when paused
+    if active_game.status == 'paused':
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Game is paused. Inquiries are disabled.'}, status=403)
+        else:
+            messages.error(request, "Game is paused. Inquiries are disabled until the game is resumed.")
+            return redirect('player_dashboard')
     
     try:
         player = Player.objects.get(game=active_game, profile=profile)
@@ -730,3 +771,113 @@ def ignore_inquiry(request, inquiry_id):
     except Inquiry.DoesNotExist:
         messages.error(request, "Inquiry not found.")
         return redirect('master_dashboard')
+
+@require_POST
+def advance_step(request, game_id):
+    """Advance the game to the next step/phase"""
+    # Check authentication
+    profile = get_profile_from_session(request)
+    if not profile or not profile.is_game_master:
+        return redirect('gm_login')
+    
+    # Get game
+    game = get_object_or_404(GameSession, id=game_id)
+    
+    # Check if this game master owns this game
+    if game.game_master != profile:
+        return HttpResponseForbidden("You don't have permission to manage this game")
+    
+    if game.status != 'in_progress':
+        messages.warning(request, "Game must be in progress to advance steps.")
+        return redirect('manage_game', game_id=game_id)
+    
+    # Get the next step
+    next_step = min(game.step + 1, 4)  # Max step is 4 (Epilogue)
+    
+    # Update the game step
+    game.step = next_step
+    game.save(update_fields=['step'])
+    
+    # Create a game event
+    event_title = f"New Stage: {game.step_display}"
+    event_description = ""
+    
+    if next_step == 2:
+        event_description = "More clues are now available. The mystery deepens!"
+    elif next_step == 3:
+        event_description = "Final clues are revealed. The solution is within reach!"
+    elif next_step == 4:
+        event_description = "Epilogue: The full story is now revealed."
+    
+    GameEvent.objects.create(
+        game=game,
+        event_type='announcement',
+        title=event_title,
+        description=event_description
+    )
+    
+    logger.info(f"Game {game.id} advanced to step {next_step} by GM {profile.name}")
+    messages.success(request, f"Game advanced to {game.step_display}")
+    
+    # TODO: WebSocket notification
+    
+    return redirect('manage_game', game_id=game_id)
+
+@require_POST
+def set_step(request, game_id):
+    """Set the game to a specific step/phase"""
+    # Check authentication
+    profile = get_profile_from_session(request)
+    if not profile or not profile.is_game_master:
+        return redirect('gm_login')
+    
+    # Get game
+    game = get_object_or_404(GameSession, id=game_id)
+    
+    # Check if this game master owns this game
+    if game.game_master != profile:
+        return HttpResponseForbidden("You don't have permission to manage this game")
+    
+    if game.status != 'in_progress':
+        messages.warning(request, "Game must be in progress to change steps.")
+        return redirect('manage_game', game_id=game_id)
+    
+    try:
+        # Get the requested step
+        new_step = int(request.POST.get('step', game.step))
+        if new_step < 1 or new_step > 4:
+            raise ValueError("Invalid step value")
+        
+        # Skip if same step
+        if new_step == game.step:
+            return redirect('manage_game', game_id=game_id)
+        
+        # Update the game step
+        game.step = new_step
+        game.save(update_fields=['step'])
+        
+        # Create a game event
+        event_title = f"Game Changed to {game.step_display}"
+        event_descriptions = {
+            1: "Initial clues are available. Begin your investigation!",
+            2: "More clues are now available. The mystery deepens!",
+            3: "Final clues are revealed. The solution is within reach!",
+            4: "Epilogue: The full story is now revealed."
+        }
+        
+        GameEvent.objects.create(
+            game=game,
+            event_type='announcement',
+            title=event_title,
+            description=event_descriptions.get(new_step, "")
+        )
+        
+        logger.info(f"Game {game.id} changed to step {new_step} by GM {profile.name}")
+        messages.success(request, f"Game changed to {game.step_display}")
+        
+        # TODO: WebSocket notification
+        
+    except (ValueError, TypeError) as e:
+        messages.error(request, f"Invalid step value: {str(e)}")
+    
+    return redirect('manage_game', game_id=game_id)

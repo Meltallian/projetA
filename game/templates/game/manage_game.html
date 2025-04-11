@@ -8,14 +8,21 @@
     <div class="game-controls">
         <h3>Game Controls</h3>
         <div class="control-buttons">
-            {% if game.status == 'waiting' %}
-                <a href="{% url 'start_game' game.id %}" class="button">Start Game</a>
-            {% elif game.status == 'in_progress' %}
-                <a href="{% url 'pause_game' game.id %}" class="button">Pause Game</a>
+            {% if game.status == 'in_progress' %}
+                <form method="post" action="{% url 'pause_game' game.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button">Pause Game</button>
+                </form>
             {% elif game.status == 'paused' %}
-                <a href="{% url 'resume_game' game.id %}" class="button">Resume Game</a>
+                <form method="post" action="{% url 'resume_game' game.id %}" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="button">Resume Game</button>
+                </form>
             {% endif %}
-            <a href="{% url 'end_game' game.id %}" class="button warning">End Game</a>
+            <form method="post" action="{% url 'end_game' game.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="button warning">End Game</button>
+            </form>
         </div>
         
         <div class="game-status">
@@ -23,6 +30,36 @@
             <p><strong>Started:</strong> {{ game.created_at|date:"F j, Y, g:i a" }}</p>
             <p><strong>Players:</strong> {{ game.player_count }}/{{ game.max_players }}</p>
         </div>
+        
+        <!-- New Game Steps Controls -->
+        {% if game.status == 'in_progress' %}
+        <div class="game-steps">
+            <h3>Game Steps</h3>
+            <p><strong>Current Step:</strong> {{ game.step_display }}</p>
+            
+            <div class="step-buttons">
+                {% if game.step < 4 %}
+                    <form method="post" action="{% url 'advance_step' game.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="button">Advance to Next Step</button>
+                    </form>
+                {% endif %}
+                
+                <div class="step-navigation">
+                    <p>Jump to step:</p>
+                    {% for step_id, step_name in game.STEP_CHOICES %}
+                        <form method="post" action="{% url 'set_step' game.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="step" value="{{ step_id }}">
+                            <button type="submit" class="button small {% if game.step == step_id %}active{% endif %}">
+                                {{ step_id }}
+                            </button>
+                        </form>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
     </div>
     
     <div class="tabs">
@@ -68,8 +105,10 @@
                             </td>
                             <td>{{ player.status }}</td>
                             <td>
-                                <a href="{% url 'message_player' player.id %}" class="button small">Message</a>
-                                <a href="{% url 'remove_player' player.id %}" class="button small warning">Remove</a>
+                                <form method="post" action="{% url 'remove_player' player.id %}" style="display: inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="button small warning">Remove</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -103,6 +142,17 @@
                         <label>Clue Description:</label>
                         <textarea name="clue_description" required></textarea>
                     </div>
+                    <div class="form-group">
+                        <label>Available in Step:</label>
+                        <select name="clue_step" required>
+                            {% for step_id, step_name in game.STEP_CHOICES %}
+                                <option value="{{ step_id }}" {% if step_id == game.step %}selected{% endif %}>
+                                    {{ step_name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <small>Players can only see clues for the current or earlier steps</small>
+                    </div>
                     <button type="submit" class="button">Send Clue</button>
                 </form>
             </div>
@@ -115,6 +165,7 @@
                             <tr>
                                 <th>Time</th>
                                 <th>Player</th>
+                                <th>Step</th>
                                 <th>Clue Title</th>
                                 <th>Clue Text</th>
                             </tr>
@@ -124,6 +175,7 @@
                             <tr>
                                 <td>{{ player_clue.received_at|date:"g:i a" }}</td>
                                 <td>{{ player_clue.player.name }}</td>
+                                <td>{{ player_clue.clue.step }}</td>
                                 <td>{{ player_clue.clue.title }}</td>
                                 <td>{{ player_clue.clue.description }}</td>
                             </tr>
