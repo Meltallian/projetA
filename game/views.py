@@ -207,12 +207,12 @@ def create_game(request):
                 return redirect('master_dashboard')
             
             with transaction.atomic():
-                # Create the game
+                # Create the game with fixed 8 players
                 game = GameSession.objects.create(
                     name=request.POST.get('name', 'New Game'),
                     game_master=profile,
                     scenario=request.POST.get('scenario', 'mansion_murder'),
-                    max_players=int(request.POST.get('max_players', 10)),
+                    max_players=8,  # Fixed to 8 players
                     solution=request.POST.get('solution', '')
                 )
                 
@@ -220,20 +220,27 @@ def create_game(request):
                 profile.current_game = game
                 profile.save(update_fields=['current_game'])
                 
-                # Create characters (optional)
-                character_names = request.POST.getlist('character_name[]', [])
-                character_descs = request.POST.getlist('character_desc[]', [])
+                # Create the 8 predefined characters
+                predefined_characters = [
+                    {"name": "The Butler", "description": "The loyal servant with access to every room in the mansion"},
+                    {"name": "The Heiress", "description": "Daughter of the wealthy family with financial troubles"},
+                    {"name": "The Detective", "description": "A brilliant but troubled investigator with a dark past"},
+                    {"name": "The Chef", "description": "Hot-tempered culinary genius who knows poisonous ingredients"},
+                    {"name": "The Maid", "description": "Quiet observer who knows everyone's secrets"},
+                    {"name": "The Business Partner", "description": "Ambitious associate with questionable ethics"},
+                    {"name": "The Doctor", "description": "Family physician with medical expertise and personal connections"},
+                    {"name": "The Visitor", "description": "Mysterious guest with an unknown agenda"}
+                ]
                 
-                for i in range(len(character_names)):
-                    if character_names[i].strip():  # Skip empty names
-                        Character.objects.create(
-                            game=game,
-                            name=character_names[i],
-                            description=character_descs[i] if i < len(character_descs) else ''
-                        )
+                for character_data in predefined_characters:
+                    Character.objects.create(
+                        game=game,
+                        name=character_data["name"],
+                        description=character_data["description"]
+                    )
                 
                 logger.info(f"Game Master {profile.name} created new game {game.id}")
-                messages.success(request, f"Game '{game.name}' has been created!")
+                messages.success(request, f"Game '{game.name}' has been created with 8 characters!")
                 return redirect('manage_game', game_id=game.id)
                 
         except Exception as e:
@@ -249,20 +256,15 @@ def end_game(request, game_id):
     # Check authentication
     profile = get_profile_from_session(request)
     if not profile or not profile.is_game_master:
-        return JsonResponse({
-            'status': 'error',
-            'message': 'Not authorized'
-        }, status=403)
+        return redirect('gm_login')
     
     try:
         game = get_object_or_404(GameSession, id=game_id)
         
         # Check if user is the game master
         if game.game_master != profile:
-            return JsonResponse({
-                'status': 'error',
-                'message': 'Only the game master can end the game'
-            }, status=403)
+            messages.error(request, "Only the game master can end the game")
+            return redirect('master_dashboard')
         
         with transaction.atomic():
             # Update game status
@@ -283,18 +285,14 @@ def end_game(request, game_id):
             )
             
             logger.info(f"Game {game.id} ended by GM {profile.name}")
+            messages.success(request, "Game ended successfully!")
             
-            return JsonResponse({
-                'status': 'success',
-                'message': 'Game ended successfully'
-            })
+            return redirect('master_dashboard')
             
     except Exception as e:
         logger.error(f"Error ending game: {str(e)}")
-        return JsonResponse({
-            'status': 'error',
-            'message': str(e)
-        }, status=500)
+        messages.error(request, f"Error ending game: {str(e)}")
+        return redirect('manage_game', game_id=game_id)
 
 def manage_game(request, game_id):
     """Game management interface for game masters"""

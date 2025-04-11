@@ -34,7 +34,7 @@ class GameSession(models.Model):
     game_master = models.OneToOneField(PlayerProfile, on_delete=models.CASCADE, related_name='current_game_session')
     scenario = models.CharField(max_length=50, choices=SCENARIO_CHOICES, default='mansion_murder')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
-    max_players = models.IntegerField(default=10)
+    max_players = models.IntegerField(default=8)
     solution = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     started_at = models.DateTimeField(null=True, blank=True)
