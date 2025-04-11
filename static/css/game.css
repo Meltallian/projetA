@@ -4,8 +4,9 @@
     --secondary-color: #34495e;
     --accent-color: #e74c3c;
     --text-color: #333;
-    --text-light: #f8f9fa;
-    --bg-color: #f8f9fa;
+    --text-light: #ffffff;
+    --bg-color: #f5f5f5;
+    --card-bg: #ffffff;
     --border-color: #dee2e6;
     --success-color: #28a745;
     --warning-color: #ffc107;
@@ -48,7 +49,7 @@ h3 {
 }
 
 a {
-    color: var(--primary-color);
+    color: var(--accent-color);
     text-decoration: none;
 }
 
@@ -73,6 +74,8 @@ input, select, textarea {
     border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 1rem;
+    color: var(--text-color);
+    background-color: white;
 }
 
 textarea {
@@ -85,6 +88,7 @@ textarea {
     padding: 1rem;
     background-color: rgba(0,0,0,0.02);
     border-radius: 4px;
+    color: var(--text-color);
 }
 
 /* Buttons */
@@ -129,9 +133,10 @@ textarea {
 .game-status {
     margin-bottom: 2rem;
     padding: 1rem;
-    background-color: white;
+    background-color: var(--card-bg);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    color: var(--text-color);
 }
 
 .active-game-info, .no-active-game {
@@ -155,12 +160,12 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 1rem;
-    background-color: white;
+    background-color: var(--card-bg);
 }
 
 thead {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--text-light);
 }
 
 th, td {
@@ -171,6 +176,10 @@ th, td {
 
 tbody tr:nth-child(even) {
     background-color: rgba(0,0,0,0.02);
+}
+
+tbody tr {
+    color: var(--text-color);
 }
 
 /* Messages */
@@ -212,18 +221,20 @@ tbody tr:nth-child(even) {
 .character-entry {
     margin-bottom: 1rem;
     padding: 1rem;
-    background-color: white;
+    background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    color: var(--text-color);
 }
 
 .character-card {
-    background-color: white;
+    background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    color: var(--text-color);
 }
 
 /* Game View */
@@ -239,7 +250,7 @@ tbody tr:nth-child(even) {
     align-items: center;
     padding: 1rem;
     background-color: var(--primary-color);
-    color: white;
+    color: var(--text-light);
     border-radius: 8px 8px 0 0;
 }
 
@@ -258,11 +269,12 @@ tbody tr:nth-child(even) {
 }
 
 .game-content {
-    background-color: white;
+    background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-top: none;
     border-radius: 0 0 8px 8px;
     padding: 1rem;
+    color: var(--text-color);
 }
 
 .game-panels {
@@ -286,11 +298,12 @@ tbody tr:nth-child(even) {
 }
 
 .clue-card, .event-card, .inquiry-card {
-    background-color: white;
+    background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    color: var(--text-color);
 }
 
 .clue-header, .event-header, .inquiry-header {
@@ -349,7 +362,7 @@ tbody tr:nth-child(even) {
 
 @keyframes highlight {
     0% { background-color: rgba(255, 255, 0, 0.3); }
-    100% { background-color: white; }
+    100% { background-color: var(--card-bg); }
 }
 
 /* Tabs */
@@ -370,11 +383,12 @@ tbody tr:nth-child(even) {
     border-bottom: none;
     border-radius: 4px 4px 0 0;
     cursor: pointer;
+    color: var(--text-color);
 }
 
 .tab-button.active {
-    background-color: white;
-    border-bottom: 2px solid white;
+    background-color: var(--card-bg);
+    border-bottom: 2px solid var(--card-bg);
     margin-bottom: -1px;
     font-weight: bold;
 }
@@ -382,9 +396,10 @@ tbody tr:nth-child(even) {
 .tab-content {
     display: none;
     padding: 1rem;
-    background-color: white;
+    background-color: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 0 4px 4px 4px;
+    color: var(--text-color);
 }
 
 .tab-content.active {
@@ -415,4 +430,11 @@ tbody tr:nth-child(even) {
     bottom: 0;
     border-radius: 50%;
     border: 4px solid transparent;
+    border-top-color: var(--accent-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

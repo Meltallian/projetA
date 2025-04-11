@@ -4,59 +4,63 @@
 <head>
     <title>{% block title %}ProjetA Murder Mystery{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="stylesheet" href="{% static 'css/game.css' %}">
+    <link rel="stylesheet" href="{% static 'css/game.css' %}">
     <style>
         :root {
-            --dark-bg: #1a1a1a;
-            --darker-bg: #111111;
-            --accent: #aa0000;
-            --accent-light: #cc0000;
-            --text: #eeeeee;
-            --secondary-text: #aaaaaa;
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #e74c3c;
+            --text-color: #333333;
+            --light-bg: #f5f5f5;
+            --card-bg: #ffffff;
+            --border-color: #dddddd;
+            --light-text: #ffffff;
+            --secondary-text: #666666;
         }
-        
+       
         body {
-            font-family: 'Georgia', serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: var(--dark-bg);
-            color: var(--text);
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
         }
-        
+       
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        
+       
         header {
-            background-color: var(--darker-bg);
+            background-color: var(--primary-color);
             padding: 20px;
-            border-bottom: 3px solid var(--accent);
+            border-bottom: 3px solid var(--accent-color);
         }
-        
+       
         h1, h2, h3 {
-            font-family: 'Times New Roman', serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+       
         h1 {
             margin: 0;
-            color: var(--accent-light);
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            color: var(--light-text);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
-        
+       
         .card {
-            background-color: var(--darker-bg);
-            border: 1px solid #333;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
+       
         .btn {
             display: inline-block;
-            background-color: var(--accent);
+            background-color: var(--accent-color);
             color: white;
             padding: 10px 20px;
             border: none;
@@ -65,23 +69,39 @@
             text-decoration: none;
             transition: background-color 0.3s;
         }
-        
+       
         .btn:hover {
-            background-color: var(--accent-light);
+            background-color: #c0392b;
         }
-        
+       
         .clue {
-            background-color: #2a2a2a;
-            border-left: 4px solid var(--accent);
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--accent-color);
             padding: 15px;
             margin: 10px 0;
+            color: var(--text-color);
         }
-        
+       
         footer {
             margin-top: 40px;
             text-align: center;
             color: var(--secondary-text);
             font-size: 0.9em;
+        }
+
+        /* Fix for any white boxes with light text issues */
+        .card, .clue, .form-section, table, .character-card, 
+        .clue-card, .event-card, .inquiry-card, .tab-content {
+            color: var(--text-color);
+        }
+
+        /* Alert styling fix */
+        .alert {
+            background-color: #3498db; 
+            color: white; 
+            padding: 10px; 
+            margin-bottom: 15px; 
+            border-radius: 4px;
         }
     </style>
     {% block extra_styles %}{% endblock %}
@@ -91,7 +111,7 @@
         <div class="container">
             <h1>ProjetA Murder Mystery</h1>
             {% if request.profile %}
-                <div style="float: right; margin-top: -30px;">
+                <div style="float: right; margin-top: -30px; color: var(--light-text);">
                     Logged in as: {{ request.profile.name }}
                     {% if request.profile.is_game_master %}
                         <span style="color: gold; margin-left: 5px;">★ Game Master</span>
@@ -100,25 +120,25 @@
             {% endif %}
         </div>
     </header>
-    
+   
     <div class="container">
         <main>
             {% if messages %}
-				{% for message in messages %}
-				<div class="alert" style="background-color: #0066aa; color: white; padding: 10px; margin-bottom: 15px; border-radius: 4px;">
-					{{ message }}
-				</div>
-			{% endfor %}
+                {% for message in messages %}
+                <div class="alert">
+                    {{ message }}
+                </div>
+                {% endfor %}
             {% endif %}
-            
+           
             {% block content %}{% endblock %}
         </main>
-        
+       
         <footer>
             <p>ProjetA Murder Mystery Game © 2025</p>
         </footer>
     </div>
-    
+   
     {% block extra_scripts %}{% endblock %}
 </body>
 </html>
