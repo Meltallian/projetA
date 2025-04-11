@@ -1,63 +1,54 @@
 <!-- game/templates/game/manage_game.html -->
 {% extends 'game/base.html' %}
-{% block title %}Manage Game - ProjetA Murder Mystery{% endblock %}
+{% block title %}Game Management - The Enchanted Forest Mystery{% endblock %}
 {% block content %}
-<div class="container">
-    <h2>Game Management</h2>
+<div class="game-management-container">
+    <div class="game-management-header">
+        <h2><i class="fas fa-crown"></i> Forest Guardian's Console</h2>
+    </div>
     
-    <div class="game-controls">
-        <h3>Game Controls</h3>
-        <div class="control-buttons">
-            {% if game.status == 'in_progress' %}
-                <form method="post" action="{% url 'pause_game' game.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="button">Pause Game</button>
-                </form>
-            {% elif game.status == 'paused' %}
-                <form method="post" action="{% url 'resume_game' game.id %}" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="button">Resume Game</button>
-                </form>
-            {% endif %}
-            <form method="post" action="{% url 'end_game' game.id %}" style="display: inline;">
-                {% csrf_token %}
-                <button type="submit" class="button warning">End Game</button>
-            </form>
-        </div>
+    <div class="game-status">
+        <h3>{{ game.name }}</h3>
+        <p><strong>Scenario:</strong> {{ game.get_scenario_display }}</p>
+        <p><strong>Status:</strong> {{ game.get_status_display }}</p>
+        <p><strong>Started:</strong> {{ game.started_at|date:"F j, Y, g:i a" }}</p>
+        <p><strong>Current Step:</strong> {{ game.get_step_display }}</p>
         
-        <div class="game-status">
-            <p><strong>Current Status:</strong> {{ game.get_status_display }}</p>
-            <p><strong>Started:</strong> {{ game.created_at|date:"F j, Y, g:i a" }}</p>
-            <p><strong>Players:</strong> {{ game.player_count }}/{{ game.max_players }}</p>
-        </div>
-        
-        <!-- New Game Steps Controls -->
-        {% if game.status == 'in_progress' %}
-        <div class="game-steps">
-            <h3>Game Steps</h3>
-            <p><strong>Current Step:</strong> {{ game.step_display }}</p>
+        <div class="game-controls">
+            <div class="control-button">
+                <form method="post" action="{% url 'pause_game' %}">
+                    {% csrf_token %}
+                    {% if game.status == 'paused' %}
+                        <button type="submit" class="button">Resume Game</button>
+                    {% else %}
+                        <button type="submit" class="button">Pause Game</button>
+                    {% endif %}
+                </form>
+            </div>
             
-            <div class="step-buttons">
-                {% if game.step < 4 %}
-                    <form method="post" action="{% url 'advance_step' game.id %}">
-                        {% csrf_token %}
-                        <button type="submit" class="button">Advance to Next Step</button>
-                    </form>
-                {% endif %}
-                
-                <div class="step-navigation">
-                    <p>Jump to step:</p>
+            <div class="control-button">
+                <form method="post" action="{% url 'end_game' %}" onsubmit="return confirm('Are you sure you want to end the game? This cannot be undone.');">
+                    {% csrf_token %}
+                    <button type="submit" class="button warning">End Game</button>
+                </form>
+            </div>
+        </div>
+
+        {% if game.status == 'in_progress' or game.status == 'paused' %}
+        <div class="game-steps">
+            <h4>Game Progression</h4>
+            <p>Advancing to a new step will make additional clues available to players.</p>
+            
+            <form method="post" action="{% url 'set_game_step' %}">
+                {% csrf_token %}
+                <div class="step-buttons">
                     {% for step_id, step_name in game.STEP_CHOICES %}
-                        <form method="post" action="{% url 'set_step' game.id %}">
-                            {% csrf_token %}
-                            <input type="hidden" name="step" value="{{ step_id }}">
-                            <button type="submit" class="button small {% if game.step == step_id %}active{% endif %}">
-                                {{ step_id }}
-                            </button>
-                        </form>
+                        <button type="submit" name="step" value="{{ step_id }}" class="step-button {% if game.step == step_id %}active{% endif %}">
+                            {{ step_name }}
+                        </button>
                     {% endfor %}
                 </div>
-            </div>
+            </form>
         </div>
         {% endif %}
     </div>
@@ -315,4 +306,170 @@
         });
     });
 </script>
+
+{% block extra_styles %}
+<style>
+    .game-management-container {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    
+    .game-management-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .game-management-header h2 {
+        font-size: 2.2rem;
+        color: var(--accent-color-light);
+        margin-bottom: 10px;
+        display: inline-block;
+        position: relative;
+    }
+    
+    .game-management-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+    }
+    
+    .game-status {
+        margin-bottom: 25px;
+        position: relative;
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        box-shadow: var(--shadow-dark);
+        padding: 20px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    
+    .game-status::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        background-image: radial-gradient(circle at top right, rgba(179, 100, 194, 0.2), transparent 70%);
+        z-index: 0;
+    }
+    
+    .game-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .control-button {
+        text-align: center;
+    }
+    
+    .game-steps {
+        margin-top: 20px;
+    }
+    
+    .step-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 15px;
+    }
+    
+    .step-button {
+        padding: 8px 15px;
+        background: linear-gradient(to bottom, var(--card-bg-light), var(--card-bg));
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-color);
+        cursor: pointer;
+        font-family: 'Quicksand', sans-serif;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .step-button.active {
+        background: linear-gradient(to bottom, var(--accent-color), var(--accent-color-dark));
+        color: white;
+        box-shadow: var(--shadow-mystical);
+    }
+    
+    .step-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    
+    /* Tab improvements */
+    .tab-content {
+        box-shadow: var(--shadow-dark);
+    }
+    
+    .tab-content h3 {
+        color: var(--accent-color-light);
+        margin-top: 0;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+        position: relative;
+    }
+    
+    .tab-content h3::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: -1px;
+        width: 60px;
+        height: 3px;
+        background-color: var(--accent-color);
+        border-radius: 3px;
+    }
+    
+    .tab-content h4 {
+        color: var(--accent-color-light);
+        margin-top: 25px;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+    
+    .send-clue-form, .create-event {
+        background-color: var(--card-bg-light);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    
+    .clue-history, .event-history {
+        background-color: var(--card-bg-light);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Make tables overflow horizontally on mobile */
+    @media (max-width: 768px) {
+        .tab-content {
+            padding: 15px;
+        }
+        
+        table {
+            display: block;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .game-controls {
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+    }
+</style>
+{% endblock %}
 {% endblock %}

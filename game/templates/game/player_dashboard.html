@@ -2,113 +2,962 @@
 {% extends 'game/base.html' %}
 {% block title %}Player Dashboard - The Enchanted Forest Mystery{% endblock %}
 {% block content %}
-<div class="container">
-    <h2>Welcome, {{ player.name }}</h2>
+<div class="dashboard-container">
+    <div class="player-header">
+        <h2><i class="fas fa-user-circle"></i> Welcome, {{ player.name }}</h2>
+        <div class="forest-divider"><span><i class="fas fa-leaf"></i></span></div>
+    </div>
     
     {% if active_game %}
         {% if active_game.status == 'waiting' %}
             <div class="waiting-room">
-                <h3>Game is Ready!</h3>
-                <p>The game master is preparing to start the mystery. Please wait...</p>
+                <div class="forest-status active">
+                    <div class="status-icon"><i class="fas fa-hourglass-start"></i></div>
+                    <div class="status-info">
+                        <h3>The Forest Awakens</h3>
+                        <p>The ancient trees whisper secrets as we await the beginning of our quest...</p>
+                    </div>
+                </div>
                 
                 {% if player.character %}
-                    <div class="character-info">
-                        <h4>Your Character: {{ player.character.name }}</h4>
-                        <p>{{ player.character.description }}</p>
+                    <div class="character-card">
+                        <div class="character-avatar">
+                            <i class="character-icon fas 
+                            {% if player.character.name == 'White Mage' %}fa-heartbeat
+                            {% elif player.character.name == 'Green Mage' %}fa-leaf
+                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
+                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
+                            {% elif player.character.name == 'Druid' %}fa-paw
+                            {% elif player.character.name == 'Centaur' %}fa-horse
+                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
+                            {% elif player.character.name == 'Magic Merchant' %}fa-store
+                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
+                            {% elif player.character.name == 'Elementalist' %}fa-fire
+                            {% else %}fa-user{% endif %}"></i>
+                        </div>
+                        <div class="character-info">
+                            <h4>{{ player.character.name }}</h4>
+                            <p>{{ player.character.description }}</p>
+                        </div>
                     </div>
                 {% else %}
-                    <p>You will be assigned a character when the game begins.</p>
+                    <div class="awaiting-character">
+                        <i class="fas fa-user-clock"></i>
+                        <p>The forest spirits have not yet chosen your form. You will be assigned a character when the adventure begins.</p>
+                    </div>
                 {% endif %}
                 
-                <p class="status-message">Status: Waiting for game master to start</p>
+                <p class="status-message">Status: <span class="status waiting">Awaiting the Game Master's signal</span></p>
             </div>
         {% elif active_game.status == 'in_progress' %}
             <div class="game-in-progress">
-                {% if player.character %}
-                    <div class="character-info">
-                        <h3>Your Character: {{ player.character.name }}</h3>
-                        <p>{{ player.character.description }}</p>
+                <div class="forest-status active">
+                    <div class="status-icon"><i class="fas fa-play-circle"></i></div>
+                    <div class="status-info">
+                        <h3>The Adventure Unfolds</h3>
+                        <p>The forest's mysteries call to you. Search for clues and help restore the balance!</p>
                     </div>
-                    
-                    <div class="clues-section">
-                        <h3>Your Clues</h3>
-                        <div class="clue-list">
-                            {% for player_clue in player.playerclue_set.all %}
-                                <div class="clue-card">
-                                    <h4>{{ player_clue.clue.title }}</h4>
-                                    <p>{{ player_clue.clue.description }}</p>
-                                    <p class="clue-timestamp">Received: {{ player_clue.received_at|date:"g:i a" }}</p>
-                                </div>
-                            {% empty %}
-                                <p>You haven't received any clues yet.</p>
-                            {% endfor %}
+                </div>
+                
+                {% if player.character %}
+                    <div class="character-card">
+                        <div class="character-avatar">
+                            <i class="character-icon fas 
+                            {% if player.character.name == 'White Mage' %}fa-heartbeat
+                            {% elif player.character.name == 'Green Mage' %}fa-leaf
+                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
+                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
+                            {% elif player.character.name == 'Druid' %}fa-paw
+                            {% elif player.character.name == 'Centaur' %}fa-horse
+                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
+                            {% elif player.character.name == 'Magic Merchant' %}fa-store
+                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
+                            {% elif player.character.name == 'Elementalist' %}fa-fire
+                            {% else %}fa-user{% endif %}"></i>
+                        </div>
+                        <div class="character-info">
+                            <h4>{{ player.character.name }}</h4>
+                            <p>{{ player.character.description }}</p>
                         </div>
                     </div>
                     
-                    <div class="inquiry-section">
-                        <h3>Make an Inquiry</h3>
-                        <form method="post" action="{% url 'submit_inquiry' %}">
-                            {% csrf_token %}
-                            <textarea name="inquiry_text" placeholder="Ask a question about the mystery..."></textarea>
-                            <button type="submit" class="button">Submit Inquiry</button>
-                        </form>
+                    <div class="gameplay-tabs">
+                        <div class="tab-nav">
+                            <button class="tab-btn active" data-tab="clues"><i class="fas fa-eye"></i> Clues</button>
+                            <button class="tab-btn" data-tab="events"><i class="fas fa-bolt"></i> Events</button>
+                            <button class="tab-btn" data-tab="inquiries"><i class="fas fa-question-circle"></i> Inquiries</button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="clues-tab">
+                                <h3><i class="fas fa-scroll"></i> Discovered Clues</h3>
+                                <div class="clue-list">
+                                    {% for player_clue in player.playerclue_set.all %}
+                                        <div class="clue-card">
+                                            <div class="clue-header">
+                                                <h4>{{ player_clue.clue.title }}</h4>
+                                                <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <p>{{ player_clue.clue.description }}</p>
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-search"></i>
+                                            <p>You haven't discovered any clues yet. Continue exploring the forest!</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane" id="events-tab">
+                                <h3><i class="fas fa-calendar-day"></i> Forest Events</h3>
+                                <div class="event-list">
+                                    {% for event in game_events %}
+                                        <div class="event-card {% if event.event_type == 'revelation' %}revelation{% elif event.event_type == 'announcement' %}announcement{% else %}event{% endif %}">
+                                            <div class="event-header">
+                                                <h4>{{ event.title }}</h4>
+                                                <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <p>{{ event.description }}</p>
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-calendar-times"></i>
+                                            <p>No events have occurred in the forest yet.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane" id="inquiries-tab">
+                                <h3><i class="fas fa-comments"></i> Your Inquiries</h3>
+                                <div class="inquiry-list">
+                                    {% for inquiry in player_inquiries %}
+                                        <div class="inquiry-card">
+                                            <div class="inquiry-header">
+                                                <div class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</div>
+                                                <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <div class="inquiry-question">
+                                                <p><strong>Your Question:</strong> {{ inquiry.text }}</p>
+                                            </div>
+                                            {% if inquiry.response %}
+                                                <div class="inquiry-response">
+                                                    <p><strong>Response:</strong> {{ inquiry.response }}</p>
+                                                    <span class="response-time">Answered: {{ inquiry.responded_at|date:"g:i a" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-question"></i>
+                                            <p>You haven't made any inquiries yet.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="inquiry-form">
+                                    <h4><i class="fas fa-paper-plane"></i> Ask the Forest Spirits</h4>
+                                    <form method="post" action="{% url 'submit_inquiry' %}">
+                                        {% csrf_token %}
+                                        <textarea name="inquiry_text" placeholder="What secrets do you wish to uncover?"></textarea>
+                                        <button type="submit" class="btn"><i class="fas fa-feather"></i> Send Inquiry</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 {% else %}
-                    <p>Waiting for character assignment...</p>
+                    <div class="awaiting-character">
+                        <i class="fas fa-user-clock"></i>
+                        <p>The forest spirits are selecting your form. Please wait to be assigned a character.</p>
+                    </div>
                 {% endif %}
             </div>
         {% elif active_game.status == 'paused' %}
             <div class="game-paused">
-                <h3>Game Paused</h3>
-                <p>The game master has temporarily paused the game. Please wait for it to resume.</p>
+                <div class="forest-status paused">
+                    <div class="status-icon"><i class="fas fa-pause-circle"></i></div>
+                    <div class="status-info">
+                        <h3>The Forest Holds Its Breath</h3>
+                        <p>The Game Master has temporarily paused the adventure. Time stands still in the Enchanted Forest.</p>
+                    </div>
+                </div>
+
                 {% if player.character %}
-                    <div class="character-info">
-                        <h3>Your Character: {{ player.character.name }}</h3>
-                        <p>{{ player.character.description }}</p>
+                    <div class="character-card">
+                        <div class="character-avatar">
+                            <i class="character-icon fas 
+                            {% if player.character.name == 'White Mage' %}fa-heartbeat
+                            {% elif player.character.name == 'Green Mage' %}fa-leaf
+                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
+                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
+                            {% elif player.character.name == 'Druid' %}fa-paw
+                            {% elif player.character.name == 'Centaur' %}fa-horse
+                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
+                            {% elif player.character.name == 'Magic Merchant' %}fa-store
+                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
+                            {% elif player.character.name == 'Elementalist' %}fa-fire
+                            {% else %}fa-user{% endif %}"></i>
+                        </div>
+                        <div class="character-info">
+                            <h4>{{ player.character.name }}</h4>
+                            <p>{{ player.character.description }}</p>
+                        </div>
                     </div>
                     
-                    <div class="clues-section">
-                        <h3>Your Clues</h3>
-                        <div class="clue-list">
-                            {% for player_clue in player.playerclue_set.all %}
-                                <div class="clue-card">
-                                    <h4>{{ player_clue.clue.title }}</h4>
-                                    <p>{{ player_clue.clue.description }}</p>
-                                    <p class="clue-timestamp">Received: {{ player_clue.received_at|date:"g:i a" }}</p>
+                    <div class="gameplay-tabs">
+                        <div class="tab-nav">
+                            <button class="tab-btn active" data-tab="clues"><i class="fas fa-eye"></i> Clues</button>
+                            <button class="tab-btn" data-tab="events"><i class="fas fa-bolt"></i> Events</button>
+                            <button class="tab-btn" data-tab="inquiries"><i class="fas fa-question-circle"></i> Inquiries</button>
+                        </div>
+                        
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="clues-tab">
+                                <h3><i class="fas fa-scroll"></i> Discovered Clues</h3>
+                                <div class="clue-list">
+                                    {% for player_clue in player.playerclue_set.all %}
+                                        <div class="clue-card">
+                                            <div class="clue-header">
+                                                <h4>{{ player_clue.clue.title }}</h4>
+                                                <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <p>{{ player_clue.clue.description }}</p>
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-search"></i>
+                                            <p>You haven't discovered any clues yet. Continue exploring the forest!</p>
+                                        </div>
+                                    {% endfor %}
                                 </div>
-                            {% empty %}
-                                <p>You haven't received any clues yet.</p>
-                            {% endfor %}
+                            </div>
+                            
+                            <div class="tab-pane" id="events-tab">
+                                <h3><i class="fas fa-calendar-day"></i> Forest Events</h3>
+                                <div class="event-list">
+                                    {% for event in game_events %}
+                                        <div class="event-card {% if event.event_type == 'revelation' %}revelation{% elif event.event_type == 'announcement' %}announcement{% else %}event{% endif %}">
+                                            <div class="event-header">
+                                                <h4>{{ event.title }}</h4>
+                                                <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <p>{{ event.description }}</p>
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-calendar-times"></i>
+                                            <p>No events have occurred in the forest yet.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <div class="tab-pane" id="inquiries-tab">
+                                <h3><i class="fas fa-comments"></i> Your Inquiries</h3>
+                                <div class="inquiry-list">
+                                    {% for inquiry in player_inquiries %}
+                                        <div class="inquiry-card">
+                                            <div class="inquiry-header">
+                                                <div class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</div>
+                                                <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
+                                            </div>
+                                            <div class="inquiry-question">
+                                                <p><strong>Your Question:</strong> {{ inquiry.text }}</p>
+                                            </div>
+                                            {% if inquiry.response %}
+                                                <div class="inquiry-response">
+                                                    <p><strong>Response:</strong> {{ inquiry.response }}</p>
+                                                    <span class="response-time">Answered: {{ inquiry.responded_at|date:"g:i a" }}</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% empty %}
+                                        <div class="empty-state">
+                                            <i class="fas fa-question"></i>
+                                            <p>You haven't made any inquiries yet.</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                
+                                <div class="inquiry-form">
+                                    <h4><i class="fas fa-paper-plane"></i> Ask the Forest Spirits</h4>
+                                    <form method="post" action="{% url 'submit_inquiry' %}">
+                                        {% csrf_token %}
+                                        <textarea name="inquiry_text" placeholder="What secrets do you wish to uncover?"></textarea>
+                                        <button type="submit" class="btn"><i class="fas fa-feather"></i> Send Inquiry</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="inquiry-section disabled">
-                        <h3>Inquiries Disabled</h3>
-                        <p>The game is currently paused. You cannot submit inquiries until the game is resumed.</p>
+                        <h3><i class="fas fa-lock"></i> Forest Communication Suspended</h3>
+                        <p>While the forest is paused, the spirits cannot hear your inquiries. Please wait until the adventure resumes.</p>
                     </div>
                 {% else %}
-                    <p>Waiting for character assignment...</p>
+                    <div class="awaiting-character">
+                        <i class="fas fa-user-clock"></i>
+                        <p>The forest spirits are selecting your form. Please wait to be assigned a character.</p>
+                    </div>
                 {% endif %}
             </div>
         {% elif active_game.status == 'completed' %}
             <div class="game-completed">
-                <h3>Adventure Completed</h3>
-                <p>The forest mystery has been solved!</p>
+                <div class="forest-status complete">
+                    <div class="status-icon"><i class="fas fa-check-circle"></i></div>
+                    <div class="status-info">
+                        <h3>The Mystery Resolved</h3>
+                        <p>The magical balance of the forest has been restored. The adventure has reached its conclusion.</p>
+                    </div>
+                </div>
+                
                 <div class="solution-reveal">
-                    <h4>The Solution</h4>
-                    <p>{{ active_game.solution }}</p>
+                    <div class="solution-header">
+                        <i class="fas fa-gem"></i>
+                        <h4>The Truth Revealed</h4>
+                    </div>
+                    <div class="solution-scroll">
+                        <p>{{ active_game.solution }}</p>
+                    </div>
                 </div>
             </div>
         {% endif %}
     {% else %}
         <div class="no-active-game">
-            <h3>No Active Game</h3>
-            <p>There is no active game at the moment. Please check back later or contact the game master.</p>
+            <div class="forest-status inactive">
+                <div class="status-icon"><i class="fas fa-moon"></i></div>
+                <div class="status-info">
+                    <h3>The Forest Sleeps</h3>
+                    <p>There is no active adventure at the moment. The ancient trees wait in silence.</p>
+                </div>
+            </div>
+            <div class="action-links">
+                <a href="{% url 'index' %}" class="btn"><i class="fas fa-home"></i> Return Home</a>
+            </div>
         </div>
     {% endif %}
     
     <div class="dashboard-footer">
-        <a href="{% url 'player_logout' %}" class="button">Logout</a>
+        <a href="{% url 'player_logout' %}" class="btn logout-btn"><i class="fas fa-sign-out-alt"></i> Leave the Forest</a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* Main container */
+    .dashboard-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    /* Header */
+    .player-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .player-header h2 {
+        color: var(--accent-color-light);
+        margin-bottom: 15px;
+        font-size: 2.2rem;
+    }
+    
+    .player-header h2 i {
+        margin-right: 10px;
+    }
+    
+    .forest-divider {
+        position: relative;
+        height: 2px;
+        background: linear-gradient(to right, transparent, var(--border-color), transparent);
+        width: 60%;
+        margin: 0 auto;
+    }
+    
+    .forest-divider span {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: var(--light-bg);
+        padding: 0 10px;
+    }
+    
+    .forest-divider span i {
+        color: var(--accent-color);
+        font-size: 1.2rem;
+    }
+    
+    /* Status sections */
+    .forest-status {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 25px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .forest-status::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://i.imgur.com/PYbTIII.png');
+        background-size: cover;
+        opacity: 0.05;
+        z-index: 0;
+    }
+    
+    .forest-status.active {
+        background: linear-gradient(135deg, rgba(44, 88, 74, 0.8), rgba(30, 58, 45, 0.8));
+        border: 1px solid rgba(44, 88, 74, 1);
+    }
+    
+    .forest-status.paused {
+        background: linear-gradient(135deg, rgba(104, 58, 106, 0.8), rgba(74, 44, 76, 0.8));
+        border: 1px solid rgba(104, 58, 106, 1);
+    }
+    
+    .forest-status.complete {
+        background: linear-gradient(135deg, rgba(58, 95, 104, 0.8), rgba(44, 58, 76, 0.8));
+        border: 1px solid rgba(58, 95, 104, 1);
+    }
+    
+    .forest-status.inactive {
+        background: linear-gradient(135deg, rgba(66, 66, 66, 0.8), rgba(44, 44, 44, 0.8));
+        border: 1px solid rgba(66, 66, 66, 1);
+    }
+    
+    .status-icon {
+        background: rgba(0, 0, 0, 0.3);
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        position: relative;
+        z-index: 1;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .status-icon i {
+        font-size: 1.8rem;
+        color: var(--accent-color-light);
+    }
+    
+    .status-info {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .status-info h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.5rem;
+        color: var(--accent-color-light);
+    }
+    
+    .status-info p {
+        margin: 0;
+        opacity: 0.9;
+    }
+    
+    /* Character card */
+    .character-card {
+        display: flex;
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow-dark);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    
+    .character-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 30%;
+        height: 100%;
+        background-image: linear-gradient(to left, rgba(179, 100, 194, 0.1), transparent);
+        z-index: 0;
+    }
+    
+    .character-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        background: rgba(179, 100, 194, 0.15);
+        border-radius: 50%;
+        margin-right: 20px;
+        position: relative;
+        flex-shrink: 0;
+        border: 2px solid var(--accent-color);
+        box-shadow: 0 0 15px rgba(179, 100, 194, 0.2);
+    }
+    
+    .character-icon {
+        font-size: 2.2rem;
+        color: var(--accent-color);
+    }
+    
+    .character-info {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .character-info h4 {
+        margin: 0 0 10px 0;
+        color: var(--accent-color-light);
+        font-size: 1.4rem;
+    }
+    
+    .character-info p {
+        margin: 0;
+        line-height: 1.5;
+    }
+    
+    .awaiting-character {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+        text-align: center;
+        box-shadow: var(--shadow-dark);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    
+    .awaiting-character i {
+        font-size: 3rem;
+        color: var(--accent-color);
+        margin-bottom: 15px;
+        opacity: 0.7;
+    }
+    
+    .awaiting-character p {
+        margin: 0;
+        font-style: italic;
+    }
+    
+    .status-message {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 0.95rem;
+    }
+    
+    .status-message .status {
+        font-weight: 600;
+    }
+    
+    .status-message .status.waiting {
+        color: var(--warning-color);
+    }
+    
+    /* Gameplay tabs */
+    .gameplay-tabs {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow-dark);
+        border: 1px solid var(--border-color);
+    }
+    
+    .tab-nav {
+        display: flex;
+        background-color: var(--card-bg-light);
+        padding: 0 5px;
+    }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 15px 20px;
+        color: var(--text-color);
+        font-size: 1rem;
+        cursor: pointer;
+        flex-grow: 1;
+        transition: all 0.3s ease;
+        font-family: 'Quicksand', sans-serif;
+        opacity: 0.7;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .tab-btn::before {
+        content: '';
+        position: absolute;
+        left: 50%;
+        bottom: 0;
+        width: 0;
+        height: 3px;
+        background-color: var(--accent-color);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+    
+    .tab-btn:hover {
+        opacity: 1;
+    }
+    
+    .tab-btn.active {
+        color: var(--accent-color-light);
+        opacity: 1;
+    }
+    
+    .tab-btn.active::before {
+        width: 50%;
+    }
+    
+    .tab-btn i {
+        margin-right: 8px;
+    }
+    
+    .tab-content {
+        padding: 25px;
+    }
+    
+    .tab-pane {
+        display: none;
+    }
+    
+    .tab-pane.active {
+        display: block;
+    }
+    
+    .tab-pane h3 {
+        margin-top: 0;
+        color: var(--accent-color-light);
+        margin-bottom: 20px;
+        font-size: 1.4rem;
+        position: relative;
+        padding-bottom: 10px;
+    }
+    
+    .tab-pane h3::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 60px;
+        height: 2px;
+        background-color: var(--accent-color);
+    }
+    
+    .tab-pane h3 i {
+        margin-right: 10px;
+    }
+    
+    /* Clue, Event, Inquiry cards */
+    .clue-card, .event-card, .inquiry-card {
+        background-color: var(--card-bg-light);
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 15px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+    }
+    
+    .clue-card::before, .event-card::before, .inquiry-card::before {
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        color: var(--accent-color);
+        opacity: 0.2;
+        font-size: 1.5rem;
+    }
+    
+    .clue-card::before {
+        content: '\f06e';  /* eye icon */
+    }
+    
+    .event-card::before {
+        content: '\f0e7';  /* bolt icon */
+    }
+    
+    .inquiry-card::before {
+        content: '\f128';  /* question icon */
+    }
+    
+    .clue-header, .event-header, .inquiry-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 10px;
+    }
+    
+    .clue-header h4, .event-header h4 {
+        margin: 0;
+        color: var(--accent-color-light);
+        font-size: 1.2rem;
+    }
+    
+    .clue-time, .event-time, .inquiry-time, .response-time {
+        font-size: 0.85rem;
+        color: rgba(233, 228, 208, 0.6);
+    }
+    
+    .event-card.revelation {
+        border-left: 3px solid var(--accent-color);
+    }
+    
+    .event-card.announcement {
+        border-left: 3px solid var(--success-color);
+    }
+    
+    .event-card.event {
+        border-left: 3px solid var(--warning-color);
+    }
+    
+    .inquiry-status {
+        font-size: 0.85rem;
+        padding: 3px 8px;
+        border-radius: 50px;
+    }
+    
+    .inquiry-status.pending {
+        background-color: rgba(208, 149, 94, 0.2);
+        color: var(--warning-color);
+    }
+    
+    .inquiry-status.answered {
+        background-color: rgba(74, 146, 112, 0.2);
+        color: var(--success-color);
+    }
+    
+    .inquiry-status.ignored {
+        background-color: rgba(168, 50, 82, 0.2);
+        color: var(--danger-color);
+    }
+    
+    .inquiry-question, .inquiry-response {
+        margin-bottom: 10px;
+    }
+    
+    .inquiry-question p, .inquiry-response p {
+        margin: 0;
+    }
+    
+    .inquiry-response {
+        background-color: rgba(74, 146, 112, 0.1);
+        padding: 10px;
+        border-radius: 5px;
+        position: relative;
+    }
+    
+    .response-time {
+        display: block;
+        text-align: right;
+        margin-top: 5px;
+    }
+    
+    /* Inquiry form */
+    .inquiry-form {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .inquiry-form h4 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: var(--accent-color-light);
+    }
+    
+    .inquiry-form textarea {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background-color: rgba(14, 20, 16, 0.5);
+        color: var(--text-color);
+        font-family: 'Quicksand', sans-serif;
+        font-size: 1rem;
+        resize: vertical;
+        min-height: 100px;
+        margin-bottom: 15px;
+    }
+    
+    .inquiry-form textarea:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 2px rgba(179, 100, 194, 0.2);
+    }
+    
+    .inquiry-form button {
+        display: block;
+        margin-left: auto;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 30px 20px;
+        color: rgba(233, 228, 208, 0.6);
+    }
+    
+    .empty-state i {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: block;
+        color: var(--accent-color);
+        opacity: 0.4;
+    }
+    
+    /* Game completed */
+    .solution-reveal {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: var(--shadow-dark);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    
+    .solution-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    
+    .solution-header i {
+        font-size: 2rem;
+        color: var(--accent-color);
+        margin-right: 15px;
+        text-shadow: 0 0 10px rgba(179, 100, 194, 0.5);
+    }
+    
+    .solution-header h4 {
+        margin: 0;
+        color: var(--accent-color-light);
+        font-size: 1.5rem;
+    }
+    
+    .solution-scroll {
+        background-color: var(--card-bg-light);
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        position: relative;
+    }
+    
+    .solution-scroll::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('https://i.imgur.com/PYbTIII.png');
+        background-size: cover;
+        opacity: 0.03;
+        z-index: 0;
+    }
+    
+    .solution-scroll p {
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        font-size: 1.1rem;
+        line-height: 1.7;
+    }
+    
+    /* Action buttons */
+    .action-links {
+        text-align: center;
+        margin: 25px 0;
+    }
+    
+    .dashboard-footer {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border-color);
+    }
+    
+    .logout-btn {
+        background: linear-gradient(to bottom, #862a34, #5f1f26);
+    }
+    
+    .logout-btn:hover {
+        background: linear-gradient(to bottom, #983039, #862a34);
+    }
+    
+    /* Media queries for better mobile experience */
+    @media (max-width: 768px) {
+        .character-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .character-avatar {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+        
+        .tab-btn {
+            padding: 12px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .tab-btn i {
+            margin-right: 5px;
+        }
+        
+        .tab-content {
+            padding: 15px;
+        }
+    }
+    
+    /* For JavaScript tab functionality */
+    /* Add this script at the bottom of the page */
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons and panes
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get the tab to activate
+                const tabToActivate = this.getAttribute('data-tab');
+                
+                // Find the corresponding pane and activate it
+                document.getElementById(tabToActivate + '-tab').classList.add('active');
+            });
+        });
+    });
+</script>
 {% endblock %}
