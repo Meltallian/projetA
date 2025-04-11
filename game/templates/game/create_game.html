@@ -4,22 +4,96 @@
 {% block title %}Create Game - ProjetA Murder Mystery{% endblock %}
 
 {% block content %}
-<div>
-    <h2>Create a New Game</h2>
-    <form method="post">
+<div class="container">
+    <h2>Create New Game</h2>
+    
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form method="post" class="game-form">
         {% csrf_token %}
-        <div>
-            <label for="game_name">Game Name:</label>
-            <input type="text" id="game_name" name="game_name" required>
+        <div class="form-group">
+            <label for="name">Game Name:</label>
+            <input type="text" id="name" name="name" required value="Mystery Manor">
+            <small>This will be visible to all players</small>
         </div>
-        <div>
+        
+        <div class="form-group">
             <label for="max_players">Maximum Players:</label>
-            <input type="number" id="max_players" name="max_players" min="6" max="14" value="10">
+            <input type="number" id="max_players" name="max_players" min="2" max="15" value="10" required>
         </div>
-        <button type="submit">Create Game</button>
+        
+        <div class="form-group">
+            <label for="scenario">Game Scenario:</label>
+            <select id="scenario" name="scenario" required>
+                <option value="mansion_murder">Mansion Murder</option>
+                <option value="cruise_crime">Cruise Ship Crime</option>
+                <option value="hotel_homicide">Hotel Homicide</option>
+            </select>
+            <small>Choose the scenario for this game session</small>
+        </div>
+        
+        <div class="form-section">
+            <h3>Character Settings</h3>
+            <div class="character-list">
+                <div class="character-entry">
+                    <input type="text" name="character_name[]" placeholder="Character Name" value="The Butler">
+                    <textarea name="character_desc[]" placeholder="Character Description">The loyal butler who has served the mansion for decades.</textarea>
+                </div>
+                <div class="character-entry">
+                    <input type="text" name="character_name[]" placeholder="Character Name" value="The Heiress">
+                    <textarea name="character_desc[]" placeholder="Character Description">Daughter of the wealthy family, with a secret to hide.</textarea>
+                </div>
+                <div class="character-entry">
+                    <input type="text" name="character_name[]" placeholder="Character Name" value="The Detective">
+                    <textarea name="character_desc[]" placeholder="Character Description">A sharp-minded investigator with a knack for solving mysteries.</textarea>
+                </div>
+                
+                <button type="button" id="add-character" class="button small">+ Add Character</button>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="solution">Game Solution:</label>
+            <textarea id="solution" name="solution" rows="3" required>The butler committed the crime after discovering the family's dark secret.</textarea>
+            <small>This will be revealed at the end of the game</small>
+        </div>
+        
+        <button type="submit" class="button">Create Game</button>
     </form>
-    <div>
-        <a href="{% url 'master_dashboard' %}">Back to Dashboard</a>
+    
+    <div class="launch-footer">
+        <a href="{% url 'master_dashboard' %}" class="button">Back to Dashboard</a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addCharacterBtn = document.getElementById('add-character');
+        const characterList = document.querySelector('.character-list');
+        
+        addCharacterBtn.addEventListener('click', function() {
+            const newCharacter = document.createElement('div');
+            newCharacter.className = 'character-entry';
+            newCharacter.innerHTML = `
+                <input type="text" name="character_name[]" placeholder="Character Name">
+                <textarea name="character_desc[]" placeholder="Character Description"></textarea>
+                <button type="button" class="remove-character button small warning">Remove</button>
+            `;
+            
+            // Insert before the add button
+            characterList.insertBefore(newCharacter, addCharacterBtn);
+            
+            // Add event listener to the remove button
+            newCharacter.querySelector('.remove-character').addEventListener('click', function() {
+                characterList.removeChild(newCharacter);
+            });
+        });
+    });
+</script>
 {% endblock %}

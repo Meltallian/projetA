@@ -7,6 +7,7 @@ class PlayerProfile(models.Model):
     verification_code = models.CharField(max_length=10)
     is_game_master = models.BooleanField(default=False)
     games_played = models.IntegerField(default=0)
+    current_game = models.OneToOneField('GameSession', on_delete=models.SET_NULL, null=True, blank=True, related_name='active_game_master')
     created_at = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
     
@@ -30,7 +31,7 @@ class GameSession(models.Model):
     ]
     
     name = models.CharField(max_length=100)
-    game_master = models.ForeignKey(PlayerProfile, on_delete=models.CASCADE, related_name='managed_games')
+    game_master = models.OneToOneField(PlayerProfile, on_delete=models.CASCADE, related_name='current_game_session')
     scenario = models.CharField(max_length=50, choices=SCENARIO_CHOICES, default='mansion_murder')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
     max_players = models.IntegerField(default=10)

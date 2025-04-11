@@ -16,7 +16,7 @@ urlpatterns = [
    
     # Game Master routes
     path('gm/dashboard/', views.master_dashboard, name='master_dashboard'),
-    path('gm/launch-game/', views.launch_game, name='launch_game'),
+    path('gm/create-game/', views.create_game, name='create_game'),
     path('gm/game/<int:game_id>/manage/', views.manage_game, name='manage_game'),
    
     # Game control actions
@@ -37,5 +37,5 @@ urlpatterns = [
     # Legacy routes - redirected to new patterns
     path('register/gm/', lambda request: redirect('gm_login'), name='register_game_master'),
     path('join/', lambda request: redirect('player_dashboard'), name='join_game'),
-    path('create/', lambda request: redirect('launch_game'), name='create_game'),
+    path('create/', lambda request: redirect('create_game'), name='create_game_legacy'),
 ]

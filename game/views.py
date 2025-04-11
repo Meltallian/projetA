@@ -4,7 +4,8 @@ from django.http import HttpResponseForbidden, JsonResponse
 from django.urls import reverse
 from django.utils import timezone
 from django.db import transaction
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
+from django.contrib.auth.decorators import login_required
 import random
 import string
 import logging
@@ -176,57 +177,124 @@ def master_dashboard(request):
     if not profile or not profile.is_game_master:
         return redirect('gm_login')
     
-    # Get active game
-    active_game = get_active_game()
+    # The active game is now directly linked to the profile
+    active_game = profile.current_game
+    
+    # Get past games for history
+    past_games = GameSession.objects.filter(
+        game_master=profile, 
+        status='completed'
+    ).order_by('-ended_at')[:5]
     
     return render(request, 'game/master_dashboard.html', {
         'profile': profile,
-        'active_game': active_game
+        'active_game': active_game,
+        'past_games': past_games
     })
 
-def launch_game(request):
-    """Create a new active game session"""
+def create_game(request):
+    """Create a new game session"""
     # Check authentication
     profile = get_profile_from_session(request)
     if not profile or not profile.is_game_master:
         return redirect('gm_login')
     
-    # Check if there's already an active game
-    active_game = get_active_game()
-    if active_game:
-        messages.warning(request, "There is already an active game. End it before launching a new one.")
-        return redirect('master_dashboard')
-    
     if request.method == 'POST':
-        # Create new game
+        try:
+            # Check if game master already has an active game
+            if profile.current_game is not None:
+                messages.warning(request, 'You already have an active game. Please complete or abandon it before starting a new one.')
+                return redirect('master_dashboard')
+            
+            with transaction.atomic():
+                # Create the game
+                game = GameSession.objects.create(
+                    name=request.POST.get('name', 'New Game'),
+                    game_master=profile,
+                    scenario=request.POST.get('scenario', 'mansion_murder'),
+                    max_players=int(request.POST.get('max_players', 10)),
+                    solution=request.POST.get('solution', '')
+                )
+                
+                # Update game master's current game
+                profile.current_game = game
+                profile.save(update_fields=['current_game'])
+                
+                # Create characters (optional)
+                character_names = request.POST.getlist('character_name[]', [])
+                character_descs = request.POST.getlist('character_desc[]', [])
+                
+                for i in range(len(character_names)):
+                    if character_names[i].strip():  # Skip empty names
+                        Character.objects.create(
+                            game=game,
+                            name=character_names[i],
+                            description=character_descs[i] if i < len(character_descs) else ''
+                        )
+                
+                logger.info(f"Game Master {profile.name} created new game {game.id}")
+                messages.success(request, f"Game '{game.name}' has been created!")
+                return redirect('manage_game', game_id=game.id)
+                
+        except Exception as e:
+            logger.error(f"Error creating game: {str(e)}")
+            messages.error(request, f"Error creating game: {str(e)}")
+    
+    # For GET requests, render the game creation form
+    return render(request, 'game/create_game.html')
+
+@require_POST
+def end_game(request, game_id):
+    """End a game session"""
+    # Check authentication
+    profile = get_profile_from_session(request)
+    if not profile or not profile.is_game_master:
+        return JsonResponse({
+            'status': 'error',
+            'message': 'Not authorized'
+        }, status=403)
+    
+    try:
+        game = get_object_or_404(GameSession, id=game_id)
+        
+        # Check if user is the game master
+        if game.game_master != profile:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Only the game master can end the game'
+            }, status=403)
+        
         with transaction.atomic():
-            game = GameSession.objects.create(
-                name=request.POST.get('game_name', 'Murder Mystery'),
-                game_master=profile,
-                max_players=int(request.POST.get('max_players', 10)),
-                scenario=request.POST.get('game_scenario', 'mansion_murder'),
-                solution=request.POST.get('game_solution', ''),
-                status='waiting'
+            # Update game status
+            game.status = 'completed'
+            game.ended_at = timezone.now()
+            game.save(update_fields=['status', 'ended_at'])
+            
+            # Clear game master's current game
+            profile.current_game = None
+            profile.save(update_fields=['current_game'])
+            
+            # Final game event revealing the solution
+            GameEvent.objects.create(
+                game=game,
+                event_type='revelation',
+                title='Mystery Solved!',
+                description=f'The mystery has been solved! {game.solution}'
             )
             
-            # Create characters
-            character_names = request.POST.getlist('character_name[]')
-            character_descs = request.POST.getlist('character_desc[]')
+            logger.info(f"Game {game.id} ended by GM {profile.name}")
             
-            for i in range(len(character_names)):
-                if character_names[i].strip():  # Skip empty names
-                    Character.objects.create(
-                        game=game,
-                        name=character_names[i],
-                        description=character_descs[i] if i < len(character_descs) else ''
-                    )
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Game ended successfully'
+            })
             
-            logger.info(f"Game Master {profile.name} launched new game {game.id}")
-            messages.success(request, f"Game '{game.name}' has been launched!")
-        
-        return redirect('master_dashboard')
-    
-    return render(request, 'game/launch_game.html')
+    except Exception as e:
+        logger.error(f"Error ending game: {str(e)}")
+        return JsonResponse({
+            'status': 'error',
+            'message': str(e)
+        }, status=500)
 
 def manage_game(request, game_id):
     """Game management interface for game masters"""
@@ -369,40 +437,6 @@ def resume_game(request, game_id):
     # TODO: WebSocket notification
     
     return redirect('manage_game', game_id=game_id)
-
-@require_POST
-def end_game(request, game_id):
-    """End the active game"""
-    profile = get_profile_from_session(request)
-    if not profile or not profile.is_game_master:
-        return redirect('gm_login')
-    
-    game = get_object_or_404(GameSession, id=game_id)
-    if game.game_master != profile:
-        return HttpResponseForbidden("You don't have permission to manage this game")
-    
-    if game.status == 'completed':
-        messages.warning(request, "Game is already completed.")
-        return redirect('master_dashboard')
-    
-    game.status = 'completed'
-    game.ended_at = timezone.now()
-    game.save()
-    
-    # Final game event revealing the solution
-    GameEvent.objects.create(
-        game=game,
-        event_type='revelation',
-        title='Mystery Solved!',
-        description=f'The mystery has been solved! {game.solution}'
-    )
-    
-    logger.info(f"Game {game.id} ended by GM {profile.name}")
-    messages.success(request, "Game has been completed!")
-    
-    # TODO: WebSocket notification
-    
-    return redirect('master_dashboard')
 
 @require_POST
 def assign_character(request):

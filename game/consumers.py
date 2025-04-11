@@ -315,10 +315,16 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
     
     async def connect(self):
         self.game_id = self.scope['url_route']['kwargs']['game_id']
-        self.profile_id = self.scope['url_route']['kwargs']['profile_id']
+        self.player_id = self.scope['url_route']['kwargs']['player_id']
         self.gm_group_name = f'gm_{self.game_id}'
         
-        # Join GM group
+        # Check if game master already has an active game
+        has_active_game = await self.check_active_game()
+        if has_active_game:
+            await self.close(code=4000)  # Custom close code for "already has active game"
+            return
+        
+        # Join game master group
         await self.channel_layer.group_add(
             self.gm_group_name,
             self.channel_name
@@ -327,8 +333,34 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
         # Accept the connection
         await self.accept()
         
+        # Update game master's current game
+        await self.update_current_game()
+        
         # Send initial game state
         await self.send_game_state()
+    
+    @database_sync_to_async
+    def check_active_game(self):
+        """Check if game master already has an active game"""
+        try:
+            from .models import PlayerProfile
+            profile = PlayerProfile.objects.get(id=self.player_id)
+            return profile.current_game is not None
+        except PlayerProfile.DoesNotExist:
+            return True  # Prevent connection if profile doesn't exist
+    
+    @database_sync_to_async
+    def update_current_game(self):
+        """Update game master's current game"""
+        try:
+            from .models import PlayerProfile, GameSession
+            profile = PlayerProfile.objects.get(id=self.player_id)
+            game = GameSession.objects.get(id=self.game_id)
+            profile.current_game = game
+            profile.save(update_fields=['current_game'])
+            return True
+        except (PlayerProfile.DoesNotExist, GameSession.DoesNotExist):
+            return False
     
     async def disconnect(self, close_code):
         # Leave GM group
@@ -336,6 +368,23 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
             self.gm_group_name,
             self.channel_name
         )
+        
+        # Clear current game if not already completed
+        await self.clear_current_game()
+    
+    @database_sync_to_async
+    def clear_current_game(self):
+        """Clear game master's current game if game is not completed"""
+        try:
+            from .models import PlayerProfile, GameSession
+            profile = PlayerProfile.objects.get(id=self.player_id)
+            game = GameSession.objects.get(id=self.game_id)
+            if game.status != 'completed':
+                profile.current_game = None
+                profile.save(update_fields=['current_game'])
+            return True
+        except (PlayerProfile.DoesNotExist, GameSession.DoesNotExist):
+            return False
     
     async def receive(self, text_data):
         """Receive message from WebSocket"""
@@ -403,7 +452,7 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
         try:
             from .models import GameSession, PlayerProfile, Player, Character, Inquiry
             game = GameSession.objects.get(id=self.game_id)
-            profile = PlayerProfile.objects.get(id=self.profile_id)
+            profile = PlayerProfile.objects.get(id=self.player_id)
             
             # Check if this profile is the game master
             if game.game_master_id != profile.id:
@@ -484,7 +533,7 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
         try:
             from .models import GameSession, PlayerProfile, GameEvent
             game = GameSession.objects.get(id=self.game_id)
-            profile = PlayerProfile.objects.get(id=self.profile_id)
+            profile = PlayerProfile.objects.get(id=self.player_id)
             
             # Check if this profile is the game master
             if game.game_master_id != profile.id:
@@ -514,7 +563,7 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
         try:
             from .models import GameSession, PlayerProfile, Player, Clue, PlayerClue
             game = GameSession.objects.get(id=self.game_id)
-            profile = PlayerProfile.objects.get(id=self.profile_id)
+            profile = PlayerProfile.objects.get(id=self.player_id)
             player = Player.objects.get(id=player_id, game=game)
             
             # Check if this profile is the game master
@@ -550,7 +599,7 @@ class GameMasterConsumer(AsyncWebsocketConsumer):
         try:
             from .models import GameSession, PlayerProfile, Inquiry
             game = GameSession.objects.get(id=self.game_id)
-            profile = PlayerProfile.objects.get(id=self.profile_id)
+            profile = PlayerProfile.objects.get(id=self.player_id)
             
             # Check if this profile is the game master
             if game.game_master_id != profile.id:
