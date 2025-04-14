@@ -1,0 +1,26 @@
+<!-- game/templates/game/components/events_list.html -->
+<div class="event-list" id="event-list">
+    {% if game_events %}
+        {% for event in game_events %}
+            {% if event.title != 'Game Paused' and event.title != 'Game Resumed' %}
+                <div class="event-card {% if event.event_type == 'revelation' %}revelation{% elif event.event_type == 'announcement' %}announcement{% else %}event{% endif %}">
+                    <div class="event-header">
+                        <h4>{{ event.title }}</h4>
+                        <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
+                    </div>
+                    <p>{{ event.description }}</p>
+                </div>
+            {% endif %}
+        {% empty %}
+            <div class="{% if dashboard %}empty-state{% else %}no-events-message{% endif %}">
+                {% if dashboard %}<i class="fas fa-calendar-times"></i>{% endif %}
+                <p>{% if dashboard %}No events have occurred in the forest yet.{% else %}The game has just begun. Events will appear here.{% endif %}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="{% if dashboard %}empty-state{% else %}no-events-message{% endif %}">
+            {% if dashboard %}<i class="fas fa-calendar-times"></i>{% endif %}
+            <p>{% if dashboard %}No events have occurred in the forest yet.{% else %}The game has just begun. Events will appear here.{% endif %}</p>
+        </div>
+    {% endif %}
+</div> 

@@ -1,0 +1,30 @@
+<!-- game/templates/game/components/character_info.html -->
+{% if player.character %}
+    <div class="character-card">
+        {% if include_avatar %}
+        <div class="character-avatar">
+            <i class="character-icon fas 
+            {% if player.character.name == 'White Mage' %}fa-heartbeat
+            {% elif player.character.name == 'Green Mage' %}fa-leaf
+            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
+            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
+            {% elif player.character.name == 'Druid' %}fa-paw
+            {% elif player.character.name == 'Centaur' %}fa-horse
+            {% elif player.character.name == 'Wood Nymph' %}fa-tree
+            {% elif player.character.name == 'Magic Merchant' %}fa-store
+            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
+            {% elif player.character.name == 'Elementalist' %}fa-fire
+            {% else %}fa-user{% endif %}"></i>
+        </div>
+        {% endif %}
+        <div class="character-description">
+            <h4>{{ player.character.name }}</h4>
+            <p>{{ player.character.description }}</p>
+        </div>
+    </div>
+{% else %}
+    <div class="{% if include_avatar %}awaiting-character{% else %}character-placeholder{% endif %}">
+        {% if include_avatar %}<i class="fas fa-user-clock"></i>{% endif %}
+        <p>{% if waiting_message %}{{ waiting_message }}{% else %}Waiting for character assignment...{% endif %}</p>
+    </div>
+{% endif %} 

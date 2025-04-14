@@ -1,0 +1,29 @@
+<!-- game/templates/game/components/clues_list.html -->
+<div class="clue-list" id="clue-list">
+    {% if player_clues %}
+        {% for player_clue in player_clues %}
+            <div class="clue-card">
+                <div class="clue-header">
+                    <h4>{{ player_clue.clue.title }}</h4>
+                    <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
+                </div>
+                <p>{{ player_clue.clue.description }}</p>
+            </div>
+        {% endfor %}
+    {% elif player.playerclue_set.all %}
+        {% for player_clue in player.playerclue_set.all %}
+            <div class="clue-card">
+                <div class="clue-header">
+                    <h4>{{ player_clue.clue.title }}</h4>
+                    <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
+                </div>
+                <p>{{ player_clue.clue.description }}</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="{% if dashboard %}empty-state{% else %}no-clues-message{% endif %}">
+            {% if dashboard %}<i class="fas fa-search"></i>{% endif %}
+            <p>You haven't {% if dashboard %}discovered{% else %}received{% endif %} any clues yet.{% if dashboard %} Continue exploring the forest!{% endif %}</p>
+        </div>
+    {% endif %}
+</div> 

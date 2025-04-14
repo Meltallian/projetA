@@ -19,33 +19,7 @@
                     </div>
                 </div>
                 
-                {% if player.character %}
-                    <div class="character-card">
-                        <div class="character-avatar">
-                            <i class="character-icon fas 
-                            {% if player.character.name == 'White Mage' %}fa-heartbeat
-                            {% elif player.character.name == 'Green Mage' %}fa-leaf
-                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
-                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
-                            {% elif player.character.name == 'Druid' %}fa-paw
-                            {% elif player.character.name == 'Centaur' %}fa-horse
-                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
-                            {% elif player.character.name == 'Magic Merchant' %}fa-store
-                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
-                            {% elif player.character.name == 'Elementalist' %}fa-fire
-                            {% else %}fa-user{% endif %}"></i>
-                        </div>
-                        <div class="character-info">
-                            <h4>{{ player.character.name }}</h4>
-                            <p>{{ player.character.description }}</p>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="awaiting-character">
-                        <i class="fas fa-user-clock"></i>
-                        <p>The forest spirits have not yet chosen your form. You will be assigned a character when the adventure begins.</p>
-                    </div>
-                {% endif %}
+                {% include 'game/components/dashboard_character.html' %}
                 
                 <p class="status-message">Status: <span class="status waiting">Awaiting the Game Master's signal</span></p>
             </div>
@@ -59,120 +33,8 @@
                     </div>
                 </div>
                 
-                {% if player.character %}
-                    <div class="character-card">
-                        <div class="character-avatar">
-                            <i class="character-icon fas 
-                            {% if player.character.name == 'White Mage' %}fa-heartbeat
-                            {% elif player.character.name == 'Green Mage' %}fa-leaf
-                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
-                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
-                            {% elif player.character.name == 'Druid' %}fa-paw
-                            {% elif player.character.name == 'Centaur' %}fa-horse
-                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
-                            {% elif player.character.name == 'Magic Merchant' %}fa-store
-                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
-                            {% elif player.character.name == 'Elementalist' %}fa-fire
-                            {% else %}fa-user{% endif %}"></i>
-                        </div>
-                        <div class="character-info">
-                            <h4>{{ player.character.name }}</h4>
-                            <p>{{ player.character.description }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="gameplay-tabs">
-                        <div class="tab-nav">
-                            <button class="tab-btn active" data-tab="clues"><i class="fas fa-eye"></i> Clues</button>
-                            <button class="tab-btn" data-tab="events"><i class="fas fa-bolt"></i> Events</button>
-                            <button class="tab-btn" data-tab="inquiries"><i class="fas fa-question-circle"></i> Inquiries</button>
-                        </div>
-                        
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="clues-tab">
-                                <h3><i class="fas fa-scroll"></i> Discovered Clues</h3>
-                                <div class="clue-list">
-                                    {% for player_clue in player.playerclue_set.all %}
-                                        <div class="clue-card">
-                                            <div class="clue-header">
-                                                <h4>{{ player_clue.clue.title }}</h4>
-                                                <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <p>{{ player_clue.clue.description }}</p>
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-search"></i>
-                                            <p>You haven't discovered any clues yet. Continue exploring the forest!</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane" id="events-tab">
-                                <h3><i class="fas fa-calendar-day"></i> Forest Events</h3>
-                                <div class="event-list">
-                                    {% for event in game_events %}
-                                        <div class="event-card {% if event.event_type == 'revelation' %}revelation{% elif event.event_type == 'announcement' %}announcement{% else %}event{% endif %}">
-                                            <div class="event-header">
-                                                <h4>{{ event.title }}</h4>
-                                                <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <p>{{ event.description }}</p>
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-calendar-times"></i>
-                                            <p>No events have occurred in the forest yet.</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane" id="inquiries-tab">
-                                <h3><i class="fas fa-comments"></i> Your Inquiries</h3>
-                                <div class="inquiry-list">
-                                    {% for inquiry in player_inquiries %}
-                                        <div class="inquiry-card">
-                                            <div class="inquiry-header">
-                                                <div class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</div>
-                                                <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <div class="inquiry-question">
-                                                <p><strong>Your Question:</strong> {{ inquiry.text }}</p>
-                                            </div>
-                                            {% if inquiry.response %}
-                                                <div class="inquiry-response">
-                                                    <p><strong>Response:</strong> {{ inquiry.response }}</p>
-                                                    <span class="response-time">Answered: {{ inquiry.responded_at|date:"g:i a" }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-question"></i>
-                                            <p>You haven't made any inquiries yet.</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                
-                                <div class="inquiry-form">
-                                    <h4><i class="fas fa-paper-plane"></i> Ask the Forest Spirits</h4>
-                                    <form method="post" action="{% url 'submit_inquiry' %}">
-                                        {% csrf_token %}
-                                        <textarea name="inquiry_text" placeholder="What secrets do you wish to uncover?"></textarea>
-                                        <button type="submit" class="btn"><i class="fas fa-feather"></i> Send Inquiry</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="awaiting-character">
-                        <i class="fas fa-user-clock"></i>
-                        <p>The forest spirits are selecting your form. Please wait to be assigned a character.</p>
-                    </div>
-                {% endif %}
+                {% include 'game/components/dashboard_character.html' %}
+                {% include 'game/components/gameplay_tabs.html' %}
             </div>
         {% elif active_game.status == 'paused' %}
             <div class="game-paused">
@@ -184,166 +46,113 @@
                     </div>
                 </div>
 
-                {% if player.character %}
-                    <div class="character-card">
-                        <div class="character-avatar">
-                            <i class="character-icon fas 
-                            {% if player.character.name == 'White Mage' %}fa-heartbeat
-                            {% elif player.character.name == 'Green Mage' %}fa-leaf
-                            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
-                            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
-                            {% elif player.character.name == 'Druid' %}fa-paw
-                            {% elif player.character.name == 'Centaur' %}fa-horse
-                            {% elif player.character.name == 'Wood Nymph' %}fa-tree
-                            {% elif player.character.name == 'Magic Merchant' %}fa-store
-                            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
-                            {% elif player.character.name == 'Elementalist' %}fa-fire
-                            {% else %}fa-user{% endif %}"></i>
-                        </div>
-                        <div class="character-info">
-                            <h4>{{ player.character.name }}</h4>
-                            <p>{{ player.character.description }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="gameplay-tabs">
-                        <div class="tab-nav">
-                            <button class="tab-btn active" data-tab="clues"><i class="fas fa-eye"></i> Clues</button>
-                            <button class="tab-btn" data-tab="events"><i class="fas fa-bolt"></i> Events</button>
-                            <button class="tab-btn" data-tab="inquiries"><i class="fas fa-question-circle"></i> Inquiries</button>
-                        </div>
-                        
-                        <div class="tab-content">
-                            <div class="tab-pane active" id="clues-tab">
-                                <h3><i class="fas fa-scroll"></i> Discovered Clues</h3>
-                                <div class="clue-list">
-                                    {% for player_clue in player.playerclue_set.all %}
-                                        <div class="clue-card">
-                                            <div class="clue-header">
-                                                <h4>{{ player_clue.clue.title }}</h4>
-                                                <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <p>{{ player_clue.clue.description }}</p>
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-search"></i>
-                                            <p>You haven't discovered any clues yet. Continue exploring the forest!</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane" id="events-tab">
-                                <h3><i class="fas fa-calendar-day"></i> Forest Events</h3>
-                                <div class="event-list">
-                                    {% for event in game_events %}
-                                        <div class="event-card {% if event.event_type == 'revelation' %}revelation{% elif event.event_type == 'announcement' %}announcement{% else %}event{% endif %}">
-                                            <div class="event-header">
-                                                <h4>{{ event.title }}</h4>
-                                                <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <p>{{ event.description }}</p>
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-calendar-times"></i>
-                                            <p>No events have occurred in the forest yet.</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane" id="inquiries-tab">
-                                <h3><i class="fas fa-comments"></i> Your Inquiries</h3>
-                                <div class="inquiry-list">
-                                    {% for inquiry in player_inquiries %}
-                                        <div class="inquiry-card">
-                                            <div class="inquiry-header">
-                                                <div class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</div>
-                                                <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
-                                            </div>
-                                            <div class="inquiry-question">
-                                                <p><strong>Your Question:</strong> {{ inquiry.text }}</p>
-                                            </div>
-                                            {% if inquiry.response %}
-                                                <div class="inquiry-response">
-                                                    <p><strong>Response:</strong> {{ inquiry.response }}</p>
-                                                    <span class="response-time">Answered: {{ inquiry.responded_at|date:"g:i a" }}</span>
-                                                </div>
-                                            {% endif %}
-                                        </div>
-                                    {% empty %}
-                                        <div class="empty-state">
-                                            <i class="fas fa-question"></i>
-                                            <p>You haven't made any inquiries yet.</p>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                
-                                <div class="inquiry-form">
-                                    <h4><i class="fas fa-paper-plane"></i> Ask the Forest Spirits</h4>
-                                    <form method="post" action="{% url 'submit_inquiry' %}">
-                                        {% csrf_token %}
-                                        <textarea name="inquiry_text" placeholder="What secrets do you wish to uncover?"></textarea>
-                                        <button type="submit" class="btn"><i class="fas fa-feather"></i> Send Inquiry</button>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="inquiry-section disabled">
-                        <h3><i class="fas fa-lock"></i> Forest Communication Suspended</h3>
-                        <p>While the forest is paused, the spirits cannot hear your inquiries. Please wait until the adventure resumes.</p>
-                    </div>
-                {% else %}
-                    <div class="awaiting-character">
-                        <i class="fas fa-user-clock"></i>
-                        <p>The forest spirits are selecting your form. Please wait to be assigned a character.</p>
-                    </div>
-                {% endif %}
+                {% include 'game/components/dashboard_character.html' %}
+                {% include 'game/components/gameplay_tabs.html' %}
+                
+                <div class="inquiry-section disabled">
+                    <h3><i class="fas fa-comment-slash"></i> Inquiries Disabled</h3>
+                    <p>The forest spirits cannot hear your questions while time is frozen. Please wait for the Game Master to resume the adventure.</p>
+                </div>
             </div>
         {% elif active_game.status == 'completed' %}
             <div class="game-completed">
-                <div class="forest-status complete">
+                <div class="forest-status completed">
                     <div class="status-icon"><i class="fas fa-check-circle"></i></div>
                     <div class="status-info">
-                        <h3>The Mystery Resolved</h3>
-                        <p>The magical balance of the forest has been restored. The adventure has reached its conclusion.</p>
+                        <h3>The Mystery Solved</h3>
+                        <p>The Enchanted Forest is once again in balance. Thank you for your part in this magical adventure!</p>
                     </div>
                 </div>
                 
-                <div class="solution-reveal">
-                    <div class="solution-header">
-                        <i class="fas fa-gem"></i>
-                        <h4>The Truth Revealed</h4>
+                {% if game_result %}
+                    <div class="mystery-solution">
+                        <h3><i class="fas fa-scroll"></i> The Resolution</h3>
+                        <div class="solution-card">
+                            <h4>{{ game_result.title }}</h4>
+                            <div class="solution-text">
+                                <p>{{ game_result.description }}</p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="solution-scroll">
-                        <p>{{ active_game.solution }}</p>
+                    
+                    <div class="character-reveal">
+                        <h3><i class="fas fa-theater-masks"></i> Character Revelations</h3>
+                        {% for character in characters %}
+                            <div class="character-card reveal">
+                                <div class="character-avatar">
+                                    <i class="fas {% if character.role == 'culprit' %}fa-skull{% else %}fa-user-circle{% endif %}"></i>
+                                </div>
+                                <div class="character-info">
+                                    <h4>{{ character.name }}{% if character.role == 'culprit' %} <span class="culprit-tag">The Culprit</span>{% endif %}</h4>
+                                    <p>{{ character.secret }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
-                </div>
+                {% endif %}
+                
+                {% include 'game/components/gameplay_tabs.html' %}
             </div>
         {% endif %}
+        
+        <div class="dashboard-footer">
+            <button id="refresh-button" class="button secondary"><i class="fas fa-sync-alt"></i> Refresh</button>
+            <a href="{% url 'player_logout' %}" class="button">Logout</a>
+        </div>
     {% else %}
         <div class="no-active-game">
             <div class="forest-status inactive">
-                <div class="status-icon"><i class="fas fa-moon"></i></div>
+                <div class="status-icon"><i class="fas fa-tree"></i></div>
                 <div class="status-info">
-                    <h3>The Forest Sleeps</h3>
-                    <p>There is no active adventure at the moment. The ancient trees wait in silence.</p>
+                    <h3>The Forest Awaits</h3>
+                    <p>You are not currently part of an active mystery. Join a game to begin your adventure!</p>
                 </div>
             </div>
-            <div class="action-links">
-                <a href="{% url 'index' %}" class="btn"><i class="fas fa-home"></i> Return Home</a>
+            
+            <div class="join-options">
+                <a href="{% url 'join_game' %}" class="button primary large"><i class="fas fa-sign-in-alt"></i> Join Game</a>
             </div>
         </div>
+        
+        <div class="dashboard-footer">
+            <a href="{% url 'player_logout' %}" class="button">Logout</a>
+        </div>
     {% endif %}
-    
-    <div class="dashboard-footer">
-        <a href="{% url 'player_logout' %}" class="btn logout-btn"><i class="fas fa-sign-out-alt"></i> Leave the Forest</a>
-    </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab switching functionality
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                // Get tab to show
+                const tabToShow = this.getAttribute('data-tab');
+                
+                // Hide all tab panes
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                
+                // Show selected tab pane
+                document.getElementById(tabToShow + '-tab').classList.add('active');
+            });
+        });
+        
+        // Refresh button functionality
+        const refreshButton = document.getElementById('refresh-button');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                location.reload();
+            });
+        }
+    });
+</script>
 {% endblock %}
 
 {% block extra_styles %}
@@ -585,9 +394,36 @@
     }
     
     .tab-nav {
-        display: flex;
+        display: flex !important;
         background-color: var(--card-bg-light);
         padding: 0 5px;
+        flex-direction: row !important;
+    }
+    
+    /* Force the tab order with flex ordering */
+    .gameplay-tabs .tab-nav .tab-btn[data-tab="clues"] {
+        order: 1 !important;
+    }
+    
+    .gameplay-tabs .tab-nav .tab-btn[data-tab="inquiries"] {
+        order: 2 !important;
+    }
+    
+    .gameplay-tabs .tab-nav .tab-btn[data-tab="events"] {
+        order: 3 !important;
+    }
+    
+    /* Similarly order the tab panes for consistency */
+    .gameplay-tabs .tab-content #clues-tab {
+        order: 1 !important;
+    }
+    
+    .gameplay-tabs .tab-content #inquiries-tab {
+        order: 2 !important;
+    }
+    
+    .gameplay-tabs .tab-content #events-tab {
+        order: 3 !important;
     }
     
     .tab-btn {
@@ -924,9 +760,19 @@
             margin-bottom: 15px;
         }
         
+        .tab-nav {
+            flex-wrap: wrap;
+        }
+        
         .tab-btn {
+            flex: 1 0 100%;
             padding: 12px 10px;
             font-size: 0.9rem;
+            border-bottom: 1px solid rgba(179, 100, 194, 0.2);
+        }
+        
+        .tab-btn:last-child {
+            border-bottom: none;
         }
         
         .tab-btn i {
@@ -936,6 +782,18 @@
         .tab-content {
             padding: 15px;
         }
+        
+        .inquiry-form textarea {
+            min-height: 80px;
+        }
+        
+        .gameplay-tabs {
+            margin-top: 20px;
+        }
+        
+        .inquiry-card, .clue-card, .event-card {
+            padding: 12px;
+        }
     }
     
     /* For JavaScript tab functionality */
@@ -944,26 +802,36 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Tab switching
+        // Tab switching functionality
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabPanes = document.querySelectorAll('.tab-pane');
         
         tabButtons.forEach(button => {
             button.addEventListener('click', function() {
-                // Remove active class from all buttons and panes
+                // Remove active class from all buttons
                 tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabPanes.forEach(pane => pane.classList.remove('active'));
-                
                 // Add active class to clicked button
                 this.classList.add('active');
                 
-                // Get the tab to activate
-                const tabToActivate = this.getAttribute('data-tab');
+                // Get tab to show
+                const tabToShow = this.getAttribute('data-tab');
                 
-                // Find the corresponding pane and activate it
-                document.getElementById(tabToActivate + '-tab').classList.add('active');
+                // Hide all tab panes
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                
+                // Show selected tab pane
+                document.getElementById(tabToShow + '-tab').classList.add('active');
             });
         });
+        
+        // Refresh button functionality
+        const refreshButton = document.getElementById('refresh-button');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', function() {
+                location.reload();
+            });
+        }
     });
 </script>
+{% endblock %}
 {% endblock %}

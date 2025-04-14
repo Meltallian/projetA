@@ -1,0 +1,28 @@
+<!-- game/templates/game/components/dashboard_character.html -->
+{% if player.character %}
+    <div class="character-card">
+        <div class="character-avatar">
+            <i class="character-icon fas 
+            {% if player.character.name == 'White Mage' %}fa-heartbeat
+            {% elif player.character.name == 'Green Mage' %}fa-leaf
+            {% elif player.character.name == 'Magenta Sorcerer' %}fa-magic
+            {% elif player.character.name == 'Forest Fairy' %}fa-feather-alt
+            {% elif player.character.name == 'Druid' %}fa-paw
+            {% elif player.character.name == 'Centaur' %}fa-horse
+            {% elif player.character.name == 'Wood Nymph' %}fa-tree
+            {% elif player.character.name == 'Magic Merchant' %}fa-store
+            {% elif player.character.name == 'Mysterious Wanderer' %}fa-cloud-moon
+            {% elif player.character.name == 'Elementalist' %}fa-fire
+            {% else %}fa-user{% endif %}"></i>
+        </div>
+        <div class="character-info">
+            <h4>{{ player.character.name }}</h4>
+            <p>{{ player.character.description }}</p>
+        </div>
+    </div>
+{% else %}
+    <div class="awaiting-character">
+        <i class="fas fa-user-clock"></i>
+        <p>{% if waiting_message %}{{ waiting_message }}{% else %}The forest spirits have not yet chosen your form. You will be assigned a character when the adventure begins.{% endif %}</p>
+    </div>
+{% endif %} 

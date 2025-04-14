@@ -1,32 +1,34 @@
 <!-- game/templates/game/lobby.html -->
 {% extends 'game/base.html' %}
 
-{% block title %}Game Lobby - ProjetA Murder Mystery{% endblock %}
+{% block title %}Game Lobby - The Enchanted Forest Mystery{% endblock %}
 
 {% block content %}
-<div>
+<div class="container waiting-room">
     <h2>Game Lobby</h2>
-    <div>
-        <h3>Game: <span id="game-name">Game Name Placeholder</span></h3>
-        <p>Room Code: <strong id="room-code">ABCDEF</strong></p>
+    <div class="game-info">
+        <h3>Game: <span id="game-name">{{ game.name }}</span></h3>
+        <p>Room Code: <strong id="room-code">{{ game.code }}</strong></p>
         <p>Status: <span id="game-status">Waiting for players</span></p>
     </div>
     
-    <div>
+    <div class="players-list">
         <h3>Players</h3>
         <ul id="player-list">
-            <li>Player 1</li>
-            <li>Player 2</li>
-            <!-- Player list will be populated dynamically -->
+            {% for player in players %}
+                <li class="player-item">{{ player.name }}</li>
+            {% empty %}
+                <li class="empty-message">No players have joined yet</li>
+            {% endfor %}
         </ul>
     </div>
     
-    <div>
+    <div class="waiting-status">
         <p>Waiting for the game master to start the game...</p>
     </div>
     
-    <div>
-        <a href="{% url 'index' %}">Leave Game</a>
+    <div class="waiting-footer">
+        <a href="{% url 'index' %}" class="button">Leave Game</a>
     </div>
 </div>
 

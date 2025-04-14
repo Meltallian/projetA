@@ -342,6 +342,60 @@ td textarea {
     overflow-y: auto;
 }
 
+/* Media queries for responsive design */
+@media (max-width: 1200px) {
+    .game-panels {
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.75rem;
+    }
+    
+    .panel {
+        padding: 0.75rem;
+    }
+}
+
+@media (max-width: 900px) {
+    .game-panels {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas: 
+            "character character"
+            "inquiries events";
+    }
+    
+    .panel {
+        height: auto;
+        max-height: 60vh;
+    }
+    
+    .character-panel {
+        grid-area: character;
+    }
+    
+    .inquiry-panel {
+        grid-area: inquiries;
+    }
+    
+    .events-panel {
+        grid-area: events;
+    }
+}
+
+@media (max-width: 600px) {
+    .game-panels {
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "character"
+            "inquiries"
+            "events";
+    }
+    
+    .panel {
+        max-height: none;
+        height: auto;
+        margin-bottom: 1rem;
+    }
+}
+
 .clue-list, .event-list, .inquiry-list {
     display: flex;
     flex-direction: column;
@@ -555,4 +609,350 @@ td textarea {
     margin-right: 10px;
     margin-bottom: 0;
     max-width: 150px;
+}
+
+/* Additional responsive styles for smaller screens */
+@media (max-width: 768px) {
+    .game-container {
+        padding: 0.5rem;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem 0.5rem;
+        text-align: center;
+    }
+    
+    .game-header h2 {
+        font-size: 1.5rem;
+        order: 1;
+    }
+    
+    .game-controls {
+        width: 100%;
+        order: 3;
+        display: flex;
+        justify-content: center;
+    }
+    
+    .player-badge {
+        order: 2;
+    }
+    
+    .game-content {
+        padding: 0.5rem;
+    }
+    
+    .inquiry-form textarea {
+        min-height: 80px;
+    }
+}
+
+/* Additional comprehensive responsive styles */
+@media (max-width: 768px) {
+    /* Base container */
+    .container {
+        padding: 10px;
+    }
+    
+    /* Typography adjustments */
+    h1 {
+        font-size: 1.8rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+    }
+    
+    /* Button adjustments */
+    .button, .btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    /* Table adjustments */
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+    
+    th, td {
+        padding: 8px 10px;
+    }
+    
+    /* Form adjustments */
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    input, select, textarea {
+        padding: 10px;
+    }
+    
+    /* Dashboard components */
+    .dashboard-footer, .login-footer, .launch-footer, 
+    .management-footer, .waiting-footer, .no-game-footer {
+        flex-direction: column;
+    }
+    
+    /* Character management */
+    .character-entry {
+        padding: 10px;
+    }
+    
+    /* Status indicators */
+    .status-icon {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+    }
+    
+    /* Event and notification cards */
+    .event-card, .notification {
+        padding: 10px;
+    }
+    
+    /* Waiting room */
+    .waiting-status {
+        flex-direction: column;
+    }
+    
+    /* Player table */
+    .player-table td select {
+        max-width: 120px;
+    }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 95%;
+    }
+    
+    .button, .btn {
+        padding: 8px 15px;
+    }
+    
+    .action-buttons {
+        flex-wrap: wrap;
+    }
+}
+
+/* Print styles */
+@media print {
+    body {
+        background: none;
+        color: black;
+    }
+    
+    .game-container, .container {
+        max-width: 100%;
+        padding: 0;
+    }
+    
+    .button, .btn, form, .inquiry-form, .dashboard-footer {
+        display: none;
+    }
+}
+
+/* Lobby and Waiting Room specific styles */
+.waiting-room {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.game-info {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-dark);
+    border: 1px solid var(--border-color);
+}
+
+.players-list {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow-dark);
+    border: 1px solid var(--border-color);
+}
+
+.player-item {
+    padding: 10px;
+    margin-bottom: 5px;
+    background: var(--card-bg-light);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.player-item:hover {
+    background: rgba(44, 88, 74, 0.3);
+}
+
+.message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.message-box {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: var(--shadow-mystical);
+    border: 1px solid var(--accent-color);
+}
+
+.message-box h3 {
+    color: var(--accent-color-light);
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.message-box p {
+    margin-bottom: 20px;
+}
+
+.message-box .close-button {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Additional responsive styles for lobby and waiting room */
+@media (max-width: 768px) {
+    .game-info, .players-list, .message-box {
+        padding: 15px;
+    }
+    
+    .player-item {
+        padding: 8px;
+    }
+    
+    .message-box {
+        width: 85%;
+        max-width: none;
+    }
+    
+    .waiting-status {
+        padding: 15px;
+    }
+    
+    .waiting-status h3 {
+        font-size: 1.2rem;
+    }
+    
+    .players-list ul {
+        padding-left: 20px;
+    }
+}
+
+/* Refined responsive styles for forms and meta elements */
+@media (max-width: 768px) {
+    /* Form layouts */
+    .form-section {
+        padding: 15px 10px;
+    }
+    
+    /* Make multi-column forms stack vertically */
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-row .form-group {
+        width: 100%;
+        margin-right: 0;
+    }
+    
+    /* Adjust spacing in card elements */
+    .card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    /* Adjust navigation elements */
+    .nav-tabs, .nav-pills {
+        flex-wrap: wrap;
+    }
+    
+    /* Improve touch targets */
+    label, .checkbox-label, .radio-label {
+        padding: 5px 0;
+        display: block;
+    }
+    
+    input[type="checkbox"], input[type="radio"] {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+    
+    /* For group buttons */
+    .button-group {
+        flex-direction: column;
+    }
+    
+    .button-group .button {
+        margin: 5px 0;
+        width: 100%;
+    }
+    
+    /* For meta controls */
+    .pagination, .breadcrumbs {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .pagination li, .breadcrumbs li {
+        margin: 2px;
+    }
+    
+    /* For modals and overlays */
+    .modal-content {
+        width: 95%;
+        max-width: none;
+        margin: 0 auto;
+    }
+    
+    /* For any fixed headers/footers */
+    .fixed-header, .fixed-footer {
+        position: relative;
+    }
+    
+    /* Improve readability on small screens */
+    body {
+        font-size: 16px;
+    }
+    
+    pre, code {
+        white-space: pre-wrap;
+        word-break: break-word;
+    }
+    
+    /* Ensure images don't break layout */
+    img {
+        max-width: 100%;
+        height: auto;
+    }
 }

@@ -1,118 +1,32 @@
 <!-- game/templates/game/game_view.html -->
 {% extends 'game/base.html' %}
-{% block title %}{{ game.name }} - The Enchanted Forest Mystery{% endblock %}
+{% load static %}
+{% block title %}{{ game.name }}{% endblock %}
 {% block content %}
 <div class="game-container">
-    <header class="game-header">
-        <div class="game-controls left-controls">
-            <button id="refresh-button" title="Refresh Game Data">
-                <i class="fas fa-sync-alt"></i> Refresh
-            </button>
-        </div>
-        <h2>{{ game.name }}</h2>
-        <div class="player-badge">
-            {% if player.character %}
-                <span class="player-name">{{ player.character.name }}</span>
-            {% else %}
-                <span class="player-name">{{ player.name }}</span>
-            {% endif %}
-        </div>
-    </header>
+    {% include 'game/components/game_header.html' with show_status=false show_controls=false %}
     
     <div class="game-content">
         <div class="game-panels">
             <!-- Left Panel - Character & Clues -->
             <div class="panel character-panel">
                 <h3>Your Character</h3>
-                {% if player.character %}
-                    <div class="character-card">
-                        <h4>{{ player.character.name }}</h4>
-                        <div class="character-description">
-                            <p>{{ player.character.description }}</p>
-                        </div>
-                    </div>
-                {% else %}
-                    <div class="character-placeholder">
-                        <p>Waiting for character assignment...</p>
-                    </div>
-                {% endif %}
+                {% include 'game/components/character_info.html' with include_avatar=false waiting_message='Waiting for character assignment...' %}
                 
                 <h3>Your Clues</h3>
-                <div class="clue-list" id="clue-list">
-                    {% for player_clue in player_clues %}
-                        <div class="clue-card">
-                            <div class="clue-header">
-                                <h4>{{ player_clue.clue.title }}</h4>
-                                <span class="clue-time">{{ player_clue.received_at|date:"g:i a" }}</span>
-                            </div>
-                            <p>{{ player_clue.clue.description }}</p>
-                        </div>
-                    {% empty %}
-                        <div class="no-clues-message">
-                            <p>You haven't received any clues yet.</p>
-                        </div>
-                    {% endfor %}
-                </div>
+                {% include 'game/components/clues_list.html' with dashboard=false %}
             </div>
             
-            <!-- Center Panel - Game Events -->
-            <div class="panel events-panel">
-                <h3>Game Events</h3>
-                <div class="event-list" id="event-list">
-                    {% for event in game_events %}
-                        {% if event.title != 'Game Paused' and event.title != 'Game Resumed' %}
-                            <div class="event-card {{ event.event_type }}">
-                                <div class="event-header">
-                                    <h4>{{ event.title }}</h4>
-                                    <span class="event-time">{{ event.created_at|date:"g:i a" }}</span>
-                                </div>
-                                <p>{{ event.description }}</p>
-                            </div>
-                        {% endif %}
-                    {% empty %}
-                        <div class="no-events-message">
-                            <p>The game has just begun. Events will appear here.</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-            
-            <!-- Right Panel - Inquiries -->
+            <!-- Center Panel - Inquiries -->
             <div class="panel inquiry-panel">
                 <h3>Inquiries</h3>
-                <div class="inquiry-form">
-                    {% if game.status == 'paused' %}
-                        <div class="paused-message">
-                            <p><strong>Game is paused!</strong> Submitting inquiries is disabled until the game master resumes the game.</p>
-                        </div>
-                    {% else %}
-                        <form id="inquiry-form" method="post" action="{% url 'submit_inquiry' %}">
-                            {% csrf_token %}
-                            <textarea name="inquiry_text" placeholder="Ask a question about the mystery..." required></textarea>
-                            <button type="submit" class="button">Submit</button>
-                        </form>
-                    {% endif %}
-                </div>
-                
-                <h4>Your Inquiries</h4>
-                <div class="inquiry-list" id="inquiry-list">
-                    {% for inquiry in player_inquiries %}
-                        <div class="inquiry-card">
-                            <div class="inquiry-header">
-                                <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
-                                <span class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</span>
-                            </div>
-                            <p class="inquiry-question">Q: {{ inquiry.text }}</p>
-                            {% if inquiry.response %}
-                                <p class="inquiry-response">A: {{ inquiry.response }}</p>
-                            {% endif %}
-                        </div>
-                    {% empty %}
-                        <div class="no-inquiries-message">
-                            <p>You haven't submitted any inquiries yet.</p>
-                        </div>
-                    {% endfor %}
-                </div>
+                {% include 'game/components/inquiries.html' with include_form=true dashboard=false %}
+            </div>
+            
+            <!-- Right Panel - Game Events -->
+            <div class="panel events-panel">
+                <h3>Game Events</h3>
+                {% include 'game/components/events_list.html' with dashboard=false %}
             </div>
         </div>
     </div>
@@ -122,247 +36,16 @@
     </footer>
 </div>
 
-<!-- WebSocket Connection Script -->
+<!-- Hidden form fields for WebSocket data -->
+<input type="hidden" id="game-id" value="{{ game.id }}">
+<input type="hidden" id="player-id" value="{{ player.id }}">
+
+<!-- Load centralized WebSocket script -->
+<script src="{% static 'js/game_websocket.js' %}"></script>
+
+<!-- Setup inquiry form submission -->
 <script>
-    // WebSocket connection for real-time updates
-    const gameId = "{{ game.id }}";
-    const playerId = "{{ player.id }}";
-    let socket;
-    
-    // Add refresh button functionality
     document.addEventListener('DOMContentLoaded', function() {
-        const refreshButton = document.getElementById('refresh-button');
-        refreshButton.addEventListener('click', function() {
-            location.reload();
-        });
-    });
-    
-    function setupWebsocket() {
-        // Adjust protocol (ws/wss) based on current page protocol
-        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${protocol}//${window.location.host}/ws/game/${gameId}/${playerId}/`;
-        
-        socket = new WebSocket(wsUrl);
-        
-        socket.onopen = function(e) {
-            console.log("WebSocket connection established");
-        };
-        
-        socket.onmessage = function(e) {
-            const data = JSON.parse(e.data);
-            console.log("Message received:", data);
-            
-            // Handle different message types
-            switch(data.type) {
-                case 'clue':
-                    addNewClue(data.clue);
-                    break;
-                case 'event':
-                    addNewEvent(data.event);
-                    break;
-                case 'inquiry_response':
-                    updateInquiry(data.inquiry);
-                    break;
-                case 'game_status':
-                    updateGameStatus(data.status);
-                    break;
-                case 'timer_update':
-                    updateTimer(data.time);
-                    break;
-            }
-        };
-        
-        socket.onclose = function(e) {
-            console.log("WebSocket connection closed. Reconnecting...");
-            // Try to reconnect after a delay
-            setTimeout(setupWebsocket, 3000);
-        };
-        
-        socket.onerror = function(e) {
-            console.error("WebSocket error:", e);
-        };
-    }
-    
-    // Add a new clue to the clue list
-    function addNewClue(clue) {
-        const clueList = document.getElementById('clue-list');
-        const noCluesMsg = clueList.querySelector('.no-clues-message');
-        
-        if (noCluesMsg) {
-            clueList.removeChild(noCluesMsg);
-        }
-        
-        const clueCard = document.createElement('div');
-        clueCard.className = 'clue-card new-clue';
-        clueCard.innerHTML = `
-            <div class="clue-header">
-                <h4>${clue.title}</h4>
-                <span class="clue-time">${clue.time}</span>
-            </div>
-            <p>${clue.description}</p>
-        `;
-        
-        clueList.prepend(clueCard);
-        
-        // Highlight new clue briefly
-        setTimeout(() => {
-            clueCard.classList.remove('new-clue');
-        }, 5000);
-    }
-    
-    // Add a new event to the event list
-    function addNewEvent(event) {
-        // Skip pause and resume events
-        if (event.title === 'Game Paused' || event.title === 'Game Resumed') {
-            return;
-        }
-        
-        const eventList = document.getElementById('event-list');
-        const noEventsMsg = eventList.querySelector('.no-events-message');
-        
-        if (noEventsMsg) {
-            eventList.removeChild(noEventsMsg);
-        }
-        
-        const eventCard = document.createElement('div');
-        eventCard.className = `event-card ${event.event_type} new-event`;
-        eventCard.innerHTML = `
-            <div class="event-header">
-                <h4>${event.title}</h4>
-                <span class="event-time">${event.time}</span>
-            </div>
-            <p>${event.description}</p>
-        `;
-        
-        eventList.prepend(eventCard);
-        
-        // Highlight new event briefly
-        setTimeout(() => {
-            eventCard.classList.remove('new-event');
-        }, 5000);
-    }
-    
-    // Update an inquiry with a response
-    function updateInquiry(inquiry) {
-        const inquiryList = document.getElementById('inquiry-list');
-        const inquiryCards = inquiryList.querySelectorAll('.inquiry-card');
-        
-        for (let card of inquiryCards) {
-            const inquiryText = card.querySelector('.inquiry-question').textContent.substring(3); // Remove "Q: " prefix
-            
-            if (inquiryText.trim() === inquiry.text.trim()) {
-                card.querySelector('.inquiry-status').textContent = inquiry.status;
-                card.querySelector('.inquiry-status').className = `inquiry-status ${inquiry.status_key}`;
-                
-                if (inquiry.response && !card.querySelector('.inquiry-response')) {
-                    const responseElem = document.createElement('p');
-                    responseElem.className = 'inquiry-response';
-                    responseElem.textContent = `A: ${inquiry.response}`;
-                    card.appendChild(responseElem);
-                }
-                
-                break;
-            }
-        }
-    }
-    
-    // Update game status
-    function updateGameStatus(status) {
-        // This could show a notification or change UI elements based on game status
-        if (status === 'completed') {
-            // Redirect to results page or show completion overlay
-            window.location.href = "{% url 'player_dashboard' %}";
-        } else if (status === 'paused') {
-            // Show paused game notification
-            showNotification('Game Paused', 'The game master has paused the game. Inquiries have been disabled until the game resumes.');
-            
-            // Update UI to show paused state
-            const inquiryForm = document.querySelector('.inquiry-form');
-            if (inquiryForm && !inquiryForm.querySelector('.paused-message')) {
-                // Save the form HTML to restore later
-                const formHTML = inquiryForm.innerHTML;
-                
-                // Replace with paused message
-                inquiryForm.innerHTML = `
-                    <div class="paused-message">
-                        <p><strong>Game is paused!</strong> Submitting inquiries is disabled until the game master resumes the game.</p>
-                    </div>
-                `;
-                
-                // Store the form HTML as a data attribute
-                inquiryForm.setAttribute('data-form-html', formHTML);
-            }
-        } else if (status === 'in_progress') {
-            // Show resumed game notification
-            showNotification('Game Resumed', 'The game has been resumed by the game master. You can now submit inquiries again.');
-            
-            // Restore the inquiry form if needed
-            const inquiryForm = document.querySelector('.inquiry-form');
-            if (inquiryForm && inquiryForm.querySelector('.paused-message')) {
-                const savedFormHTML = inquiryForm.getAttribute('data-form-html');
-                if (savedFormHTML) {
-                    inquiryForm.innerHTML = savedFormHTML;
-                }
-            }
-        }
-    }
-    
-    // Show notification
-    function showNotification(title, message) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.className = 'game-notification';
-        notification.innerHTML = `
-            <div class="notification-header">
-                <h4>${title}</h4>
-                <button class="close-btn">&times;</button>
-            </div>
-            <p>${message}</p>
-        `;
-        
-        // Add to page
-        document.body.appendChild(notification);
-        
-        // Show with animation
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Add close button functionality
-        notification.querySelector('.close-btn').addEventListener('click', () => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        });
-        
-        // Auto-dismiss after 8 seconds
-        setTimeout(() => {
-            if (document.body.contains(notification)) {
-                notification.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(notification)) {
-                        notification.remove();
-                    }
-                }, 300);
-            }
-        }, 8000);
-    }
-    
-    // Update the game timer
-    function updateTimer(time) {
-        // Timer removed and replaced with refresh button
-    }
-    
-    // Initialize page
-    document.addEventListener('DOMContentLoaded', function() {
-        setupWebsocket();
-        
-        // If game is already paused, ensure the inquiry form is disabled
-        {% if game.status == 'paused' %}
-        showNotification('Game is Paused', 'The game is currently paused. You cannot submit inquiries until the game master resumes it.');
-        {% endif %}
-        
         // Setup inquiry form submission (only if game is not paused)
         {% if game.status != 'paused' %}
         const inquiryForm = document.getElementById('inquiry-form');
@@ -413,6 +96,13 @@
                     showNotification('Error', 'There was a problem submitting your inquiry. Please try again.');
                 });
             });
+        }
+        {% endif %}
+        
+        // Show paused notification if needed
+        {% if game.status == 'paused' %}
+        if (window.gameSocket) {
+            window.gameSocket.showNotification('Game is Paused', 'The game is currently paused. You cannot submit inquiries until the game master resumes it.');
         }
         {% endif %}
     });

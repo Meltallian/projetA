@@ -19,6 +19,14 @@ up:
 	sudo docker compose exec web python manage.py migrate
 	sudo docker compose exec web python manage.py ensure_default_users
 
+r:
+	sudo docker compose down
+	sudo docker compose up -d
+	sudo docker compose exec web python manage.py collectstatic --noinput
+	sudo docker compose exec web python manage.py makemigrations
+	sudo docker compose exec web python manage.py migrate
+	sudo docker compose exec web python manage.py ensure_default_users
+
 detach:
 	sudo docker compose up
 	sudo docker compose exec web python manage.py collectstatic --noinput

@@ -1,0 +1,50 @@
+<!-- game/templates/game/components/game_header.html -->
+<div class="game-header">
+    <div class="game-title">
+        <h1>{{ game.name }}</h1>
+        {% if dashboard %}
+            <div class="player-name">Playing as: {{ player.user.username }}</div>
+        {% endif %}
+    </div>
+    
+    {% if show_status %}
+    <div class="game-status-badge {{ game.status }}">
+        {% if game.status == 'waiting' %}
+            <i class="fas fa-hourglass-half"></i> Waiting to Begin
+        {% elif game.status == 'in_progress' %}
+            <i class="fas fa-play-circle"></i> In Progress
+        {% elif game.status == 'paused' %}
+            <i class="fas fa-pause-circle"></i> Paused
+        {% elif game.status == 'completed' %}
+            <i class="fas fa-check-circle"></i> Completed
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    {% if show_controls and is_game_master %}
+    <div class="game-controls">
+        {% if game.status == 'waiting' %}
+            <form method="post" action="{% url 'start_game' game.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn start-game">
+                    <i class="fas fa-play"></i> Start Game
+                </button>
+            </form>
+        {% elif game.status == 'in_progress' %}
+            <form method="post" action="{% url 'pause_game' game.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn pause-game">
+                    <i class="fas fa-pause"></i> Pause Game
+                </button>
+            </form>
+        {% elif game.status == 'paused' %}
+            <form method="post" action="{% url 'resume_game' game.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn resume-game">
+                    <i class="fas fa-play"></i> Resume Game
+                </button>
+            </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div> 

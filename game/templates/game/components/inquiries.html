@@ -1,0 +1,55 @@
+<!-- game/templates/game/components/inquiries.html -->
+{% if include_form %}
+<div class="inquiry-form">
+    {% if game.status == 'paused' %}
+        <div class="paused-message">
+            <p><strong>Game is paused!</strong> Submitting inquiries is disabled until the game master resumes the game.</p>
+        </div>
+    {% else %}
+        <form id="inquiry-form" method="post" action="{% url 'submit_inquiry' %}">
+            {% csrf_token %}
+            <textarea name="inquiry_text" placeholder="{% if dashboard %}What secrets do you wish to uncover?{% else %}Ask a question about the mystery...{% endif %}" required></textarea>
+            <button type="submit" class="{% if dashboard %}btn{% else %}button{% endif %}">
+                {% if dashboard %}<i class="fas fa-feather"></i> Send Inquiry{% else %}Submit{% endif %}
+            </button>
+        </form>
+    {% endif %}
+</div>
+{% endif %}
+
+<div class="inquiry-list" id="inquiry-list">
+    {% if player_inquiries %}
+        {% for inquiry in player_inquiries %}
+            <div class="inquiry-card">
+                <div class="inquiry-header">
+                    {% if dashboard %}
+                    <div class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</div>
+                    <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
+                    {% else %}
+                    <span class="inquiry-time">{{ inquiry.created_at|date:"g:i a" }}</span>
+                    <span class="inquiry-status {{ inquiry.status }}">{{ inquiry.get_status_display }}</span>
+                    {% endif %}
+                </div>
+                <div class="inquiry-question">
+                    <p>{% if dashboard %}<strong>Your Question:</strong> {% else %}Q: {% endif %}{{ inquiry.text }}</p>
+                </div>
+                {% if inquiry.response %}
+                    <div class="inquiry-response">
+                        <p>{% if dashboard %}<strong>Response:</strong> {% else %}A: {% endif %}{{ inquiry.response }}</p>
+                        {% if dashboard %}<span class="response-time">Answered: {{ inquiry.responded_at|date:"g:i a" }}</span>{% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div class="{% if dashboard %}empty-state{% else %}no-inquiries-message{% endif %}">
+                {% if dashboard %}<i class="fas fa-question"></i>{% endif %}
+                <p>You haven't {% if dashboard %}made{% else %}submitted{% endif %} any inquiries yet.</p>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="{% if dashboard %}empty-state{% else %}no-inquiries-message{% endif %}">
+            {% if dashboard %}<i class="fas fa-question"></i>{% endif %}
+            <p>You haven't {% if dashboard %}made{% else %}submitted{% endif %} any inquiries yet.</p>
+        </div>
+    {% endif %}
+</div> 

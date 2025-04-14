@@ -1,0 +1,25 @@
+<!-- game/templates/game/components/gameplay_tabs.html -->
+<div class="gameplay-tabs">
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="clues"><i class="fas fa-eye"></i> Clues</button>
+        <button class="tab-btn" data-tab="inquiries"><i class="fas fa-question-circle"></i> Inquiries</button>
+        <button class="tab-btn" data-tab="events"><i class="fas fa-bolt"></i> Events</button>
+    </div>
+    
+    <div class="tab-content">
+        <div class="tab-pane active" id="clues-tab">
+            <h3><i class="fas fa-scroll"></i> Discovered Clues</h3>
+            {% include 'game/components/clues_list.html' with dashboard=true %}
+        </div>
+        
+        <div class="tab-pane" id="inquiries-tab">
+            <h3><i class="fas fa-comments"></i> Your Inquiries</h3>
+            {% include 'game/components/inquiries.html' with include_form=true dashboard=true %}
+        </div>
+        
+        <div class="tab-pane" id="events-tab">
+            <h3><i class="fas fa-calendar-day"></i> Forest Events</h3>
+            {% include 'game/components/events_list.html' with dashboard=true %}
+        </div>
+    </div>
+</div> 
