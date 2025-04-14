@@ -232,6 +232,7 @@
                 <h4>Create Game Event</h4>
                 <form method="post" action="{% url 'create_event' %}">
                     {% csrf_token %}
+                    <input type="hidden" name="game_id" value="{{ game.id }}">
                     <div class="form-group">
                         <label>Event Type:</label>
                         <select name="event_type" required>

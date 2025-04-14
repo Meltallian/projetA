@@ -485,7 +485,11 @@ def assign_character(request):
         
         # Check if character is already assigned
         if Player.objects.filter(character=character).exists():
-            return JsonResponse({'success': False, 'error': 'Character already assigned to another player'}, status=400)
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'success': False, 'error': 'Character already assigned to another player'}, status=400)
+            else:
+                messages.error(request, "Character already assigned to another player")
+                return redirect('manage_game', game_id=player.game.id)
         
         # Assign character
         player.character = character
@@ -495,10 +499,18 @@ def assign_character(request):
         
         # TODO: WebSocket notification
         
-        return JsonResponse({'success': True})
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            messages.success(request, f"Character '{character.name}' assigned to player {player.name}")
+            return redirect('manage_game', game_id=player.game.id)
         
     except (Player.DoesNotExist, Character.DoesNotExist):
-        return JsonResponse({'success': False, 'error': 'Player or Character not found'}, status=404)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Player or Character not found'}, status=404)
+        else:
+            messages.error(request, "Player or Character not found")
+            return redirect('master_dashboard')
 
 @require_POST
 def send_clue(request):
@@ -513,7 +525,11 @@ def send_clue(request):
     clue_step = int(request.POST.get('clue_step', 1))  # Default to step 1
     
     if not all([player_id, clue_title, clue_description]):
-        return JsonResponse({'success': False, 'error': 'Missing required fields'}, status=400)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Missing required fields'}, status=400)
+        else:
+            messages.error(request, "Missing required fields")
+            return redirect('master_dashboard')
     
     try:
         player = Player.objects.get(id=player_id)
@@ -538,10 +554,18 @@ def send_clue(request):
         
         # TODO: WebSocket notification
         
-        return JsonResponse({'success': True})
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            messages.success(request, f"Clue '{clue_title}' sent to player {player.name}")
+            return redirect('manage_game', game_id=game.id)
         
     except Player.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Player not found'}, status=404)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Player not found'}, status=404)
+        else:
+            messages.error(request, "Player not found")
+            return redirect('master_dashboard')
 
 @require_POST
 def submit_inquiry(request):
@@ -645,7 +669,11 @@ def create_event(request):
     """Game master creates a game event"""
     profile = get_profile_from_session(request)
     if not profile or not profile.is_game_master:
-        return JsonResponse({'success': False, 'error': 'Not authorized'}, status=403)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Not authorized'}, status=403)
+        else:
+            messages.error(request, "Not authorized to perform this action.")
+            return redirect('master_dashboard')
     
     event_type = request.POST.get('event_type')
     event_title = request.POST.get('event_title')
@@ -653,7 +681,14 @@ def create_event(request):
     game_id = request.POST.get('game_id')
     
     if not all([event_type, event_title, event_description, game_id]):
-        return JsonResponse({'success': False, 'error': 'Missing required fields'}, status=400)
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Missing required fields'}, status=400)
+        else:
+            messages.error(request, "Missing required fields for creating an event.")
+            if game_id:
+                return redirect('manage_game', game_id=game_id)
+            else:
+                return redirect('master_dashboard')
     
     try:
         game = GameSession.objects.get(id=game_id, game_master=profile)
@@ -674,14 +709,14 @@ def create_event(request):
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': True})
         else:
-            messages.success(request, "Event created and sent to all players!")
+            messages.success(request, f"Event '{event_title}' created and sent to all players!")
             return redirect('manage_game', game_id=game_id)
         
     except GameSession.DoesNotExist:
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Game not found'}, status=404)
         else:
-            messages.error(request, "Error creating event.")
+            messages.error(request, "Game not found or you don't have permission to manage it.")
             return redirect('master_dashboard')
 
 def check_game_status(request):
