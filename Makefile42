@@ -1,0 +1,82 @@
+.PHONY: up down build logs shell migrate makemigrations createsuperuser clean help
+
+help:
+	@echo "Available commands:"
+	@echo "  make up              - Start all containers in detached mode"
+	@echo "  make down            - Stop all containers"
+	@echo "  make build           - Rebuild all containers"
+	@echo "  make logs            - View logs from all containers"
+	@echo "  make shell           - Open a shell in the web container"
+	@echo "  make migrate         - Run Django migrations"
+	@echo "  make makemigrations  - Create new Django migrations"
+	@echo "  make createsuperuser - Create a Django superuser"
+	@echo "  make clean           - Remove all containers, volumes, and images"
+
+up:
+	docker compose up -d
+	docker compose exec web python manage.py collectstatic --noinput
+	docker compose exec web python manage.py makemigrations
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py ensure_default_users
+
+r:
+	docker compose down
+	docker compose up -d
+	docker compose exec web python manage.py collectstatic --noinput
+	docker compose exec web python manage.py makemigrations
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py ensure_default_users
+
+detach:
+	docker compose up
+	docker compose exec web python manage.py collectstatic --noinput
+	docker compose exec web python manage.py makemigrations
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py ensure_default_users
+
+down:
+	docker compose down
+
+re:
+	docker compose down -v --rmi all --remove-orphans
+	docker compose up -d
+	docker compose exec web python manage.py collectstatic --noinput
+	docker compose exec web python manage.py makemigrations
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py ensure_default_users	
+
+build:
+	docker compose build
+
+logs:
+	docker compose logs -f
+
+shell:
+	docker compose exec web /bin/bash
+
+mig:
+	docker compose exec web python manage.py collectstatic --noinput
+	docker compose exec web python manage.py makemigrations
+	docker compose exec web python manage.py migrate
+	docker compose exec web python manage.py ensure_default_users
+
+migrate:
+	docker compose exec web python manage.py migrate
+
+super:
+	docker compose exec web python manage.py createsuperuser
+
+clean:
+	docker compose down -v --rmi all --remove-orphans
+
+test:
+	docker compose exec web python manage.py test
+
+collectstatic:
+	docker compose exec web python manage.py collectstatic --noinput
+
+restart:
+	docker compose restart
+
+ps:
+	docker compose ps
