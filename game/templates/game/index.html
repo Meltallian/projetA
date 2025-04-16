@@ -8,11 +8,6 @@
         <div class="magical-trees right-tree"></div>
         
         <h2 class="enchanted-title">The Whispers of the Ancient Oak</h2>
-        <p class="subtitle">A magical adventure in the heart of the Whispering Woods</p>
-        
-        <div class="mystical-divider">
-            <span><i class="fas fa-leaf"></i></span>
-        </div>
     </div>
     
     <div class="scene-card animated-card">
@@ -21,11 +16,6 @@
         
         <h3><i class="fas fa-book-dead"></i> A Dark Mystery Unfolds</h3>
         <p>Deep within the Whispering Woods, beneath the canopy of ancient trees, a powerful artifact known as the Crystal of Harmony has been stolen from the Sacred Glade. The forest's magical balance has been disturbed, causing darkness to spread through the realm.</p>
-        
-        <div class="mystical-scene">
-            <div class="floating-crystal"></div>
-            <div class="pulsing-glow"></div>
-        </div>
         
         <p>Strange whispers echo through the trees, and shadows grow longer with each passing moment. The forest creatures speak of a dark ritual that will be performed under the Blood Moon, now just hours away.</p>
         <p>As magical beings of the forest, you must unite your unique powers to discover who has taken the crystal and stop them before the ritual is complete and the darkness becomes permanent.</p>
@@ -84,9 +74,9 @@
     /* Enhanced Header with Animated Elements */
     .welcome-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 20px;
         position: relative;
-        padding: 40px 0 20px;
+        padding: 15px 0 5px;
     }
     
     .magical-trees {
@@ -123,8 +113,8 @@
     }
     
     .enchanted-title {
-        font-size: 2.8rem;
-        margin-bottom: 10px;
+        font-size: 2.5rem;
+        margin-bottom: 0;
         background: linear-gradient(120deg, var(--accent-color-light), var(--accent-color), var(--accent-color-dark));
         -webkit-background-clip: text;
         background-clip: text;
@@ -199,51 +189,6 @@
         border-radius: 15px;
         box-shadow: inset 0 0 30px rgba(179, 100, 194, 0.2);
         pointer-events: none;
-    }
-    
-    .mystical-scene {
-        position: relative;
-        height: 100px;
-        margin: 30px 0;
-        overflow: hidden;
-    }
-    
-    .floating-crystal {
-        position: absolute;
-        width: 40px;
-        height: 40px;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon fill='%23b364c2' points='50,10 90,30 90,70 50,90 10,70 10,30' /%3E%3C/svg%3E");
-        background-size: contain;
-        background-repeat: no-repeat;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        opacity: 0.8;
-        animation: crystalFloat 4s ease-in-out infinite;
-    }
-    
-    @keyframes crystalFloat {
-        0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
-        25% { transform: translate(-50%, -60%) rotate(10deg); }
-        50% { transform: translate(-50%, -50%) rotate(0deg); }
-        75% { transform: translate(-50%, -40%) rotate(-10deg); }
-    }
-    
-    .pulsing-glow {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(179, 100, 194, 0.7) 0%, transparent 70%);
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        animation: pulseGlow 3s ease-in-out infinite;
-    }
-    
-    @keyframes pulseGlow {
-        0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
-        50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.3); }
     }
     
     .scene-card h3 {

@@ -80,13 +80,17 @@
 <style>
     .game-header {
         position: relative;
-        padding: 40px 30px;
-        margin-bottom: 30px;
+        padding: clamp(0.8rem, 2vh, 1.5rem) clamp(1rem, 3vw, 1.8rem);
+        margin-bottom: clamp(0.8rem, 2vh, 1.5rem);
         background: linear-gradient(135deg, rgba(23, 37, 32, 0.8), rgba(30, 58, 45, 0.7));
-        border-radius: 15px;
-        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        border-radius: 0.625rem;
+        box-shadow: 0 0.3rem 1rem rgba(0,0,0,0.3);
         overflow: hidden;
         border: 1px solid rgba(179, 100, 194, 0.2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
     
     .forest-ambience {
@@ -120,10 +124,10 @@
     
     .ambient-glow {
         position: absolute;
-        width: 150px;
-        height: 150px;
+        width: clamp(3rem, 6vw, 5rem);
+        height: clamp(3rem, 6vw, 5rem);
         border-radius: 50%;
-        filter: blur(40px);
+        filter: blur(clamp(1rem, 2vw, 1.5rem));
         opacity: 0.2;
         animation: glowPulse 8s infinite alternate ease-in-out;
     }
@@ -150,10 +154,12 @@
         position: relative;
         text-align: center;
         z-index: 2;
-        margin-bottom: 20px;
+        margin-bottom: 0.625rem;
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        width: 100%;
     }
     
     .title-flourish {
@@ -165,11 +171,11 @@
     }
     
     .title-flourish.left {
-        left: 0;
+        left: 5%;
     }
     
     .title-flourish.right {
-        right: 0;
+        right: 5%;
         flex-direction: row-reverse;
     }
     
@@ -181,21 +187,23 @@
     
     .flourish-line {
         height: 1px;
-        width: 50px;
+        width: clamp(1.5rem, 4vw, 3rem);
         background: linear-gradient(to right, transparent, rgba(179, 100, 194, 0.5), transparent);
     }
     
     .enchanted-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin: 0;
-        padding: 0 70px;
+        font-size: clamp(1.2rem, 3vw, 1.5rem);
+        font-weight: 700;
+        margin: 0 auto;
+        padding: 0 clamp(2rem, 5vw, 3rem);
         background: linear-gradient(120deg, var(--accent-color-light), var(--accent-color), var(--accent-color-dark));
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
-        text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        text-shadow: 0 0.125rem 0.3rem rgba(0, 0, 0, 0.3);
         animation: titleGlow 4s infinite alternate;
+        display: inline-block;
+        text-align: center;
     }
     
     @keyframes titleGlow {
@@ -204,14 +212,15 @@
     }
     
     .player-name {
-        margin-top: 10px;
-        font-size: 1rem;
+        margin-top: 0.3rem;
+        font-size: 0.8rem;
         position: relative;
         display: inline-block;
-        padding: 5px 15px;
-        border-radius: 20px;
+        padding: 0.2rem 0.625rem;
+        border-radius: 1rem;
         background: rgba(30, 58, 45, 0.4);
         border: 1px solid rgba(179, 100, 194, 0.2);
+        text-align: center;
     }
     
     .player-prefix {
@@ -246,11 +255,12 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        padding: 10px 20px;
-        border-radius: 30px;
+        padding: 0.3rem 0.8rem;
+        border-radius: 1.25rem;
         font-weight: 600;
+        font-size: 0.8rem;
         color: white;
-        margin: 10px auto;
+        margin: 0.3rem auto;
         z-index: 2;
         overflow: hidden;
     }
@@ -284,7 +294,8 @@
     .status-content {
         display: flex;
         align-items: center;
-        gap: 10px;
+        justify-content: center;
+        gap: 5px;
         position: relative;
         z-index: 1;
     }
@@ -349,29 +360,29 @@
     .game-controls {
         display: flex;
         justify-content: center;
-        margin-top: 15px;
+        margin-top: 0.5rem;
         position: relative;
         z-index: 2;
     }
     
     .magical-button {
         position: relative;
-        padding: 12px 25px;
-        border-radius: 50px;
+        padding: 0.4rem 1rem;
+        border-radius: 1.25rem;
         border: none;
         color: white;
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.85rem;
         cursor: pointer;
         overflow: hidden;
         transition: all 0.3s ease;
         background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2), 0 0 20px rgba(179, 100, 194, 0.3);
+        box-shadow: 0 0.2rem 0.6rem rgba(0,0,0,0.2), 0 0 0.8rem rgba(179, 100, 194, 0.3);
     }
     
     .magical-button:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 30px rgba(179, 100, 194, 0.5);
+        transform: translateY(-0.125rem);
+        box-shadow: 0 0.3rem 0.8rem rgba(0,0,0,0.3), 0 0 1rem rgba(179, 100, 194, 0.5);
     }
     
     .btn-glow {
@@ -402,12 +413,13 @@
     
     @media (max-width: 768px) {
         .game-header {
-            padding: 30px 20px;
+            padding: 0.6rem 0.8rem;
         }
         
         .enchanted-title {
-            font-size: 1.8rem;
-            padding: 0 50px;
+            font-size: 1rem;
+            padding: 0 1.5rem;
+            width: 100%;
         }
         
         .title-flourish {
