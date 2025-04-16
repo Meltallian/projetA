@@ -1,34 +1,301 @@
 <!-- game/templates/game/login.html -->
 {% extends 'game/base.html' %}
-{% block title %}Player Login - ProjetA Murder Mystery{% endblock %}
+{% block title %}Player Login - The Enchanted Forest Mystery{% endblock %}
 {% block content %}
 <div class="container">
-    <h2>Player Login</h2>
-    
-    {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-                <div class="message {{ message.tags }}">{{ message }}</div>
-            {% endfor %}
+    <div class="login-container">
+        <div class="magical-trees left-tree"></div>
+        <div class="magical-trees right-tree"></div>
+        
+        <h2 class="enchanted-title">Enter the Whispering Woods</h2>
+        
+        <div class="mystical-divider with-icon">
+            <span><i class="fas fa-key"></i></span>
         </div>
-    {% endif %}
-    
-    <form method="post" class="login-form">
-        {% csrf_token %}
-        <div class="form-group">
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }} animated-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="login-card">
+            <div class="card-glimmer"></div>
+            
+            <form method="post" class="login-form">
+                {% csrf_token %}
+                <div class="floating-label form-group">
+                    <input type="text" id="name" name="name" placeholder=" " required>
+                    <label for="name">Your Forest Name</label>
+                    <div class="input-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+                
+                <div class="floating-label form-group">
+                    <input type="password" id="verification_code" name="verification_code" placeholder=" " required maxlength="4" pattern="[0-9]*">
+                    <label for="verification_code">Secret Rune Code</label>
+                    <div class="input-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <small>Enter your 4-digit mystical code</small>
+                </div>
+                
+                <button type="submit" class="button login-button">
+                    <span class="button-text">Enter the Forest</span>
+                    <span class="button-icon"><i class="fas fa-tree"></i></span>
+                </button>
+            </form>
         </div>
-        <div class="form-group">
-            <label for="verification_code">Verification Code:</label>
-            <input type="password" id="verification_code" name="verification_code" required maxlength="4" pattern="[0-9]*">
-            <small>Enter your 4-digit code</small>
+        
+        <div class="login-footer">
+            <a href="{% url 'index' %}" class="return-link">
+                <i class="fas fa-arrow-left"></i> Return to the Crossroads
+            </a>
         </div>
-        <button type="submit" class="button">Login</button>
-    </form>
-    
-    <div class="login-footer">
-        <a href="{% url 'index' %}">Back to Home</a>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .login-container {
+        max-width: 500px;
+        margin: 40px auto;
+        position: relative;
+    }
+    
+    .enchanted-title {
+        text-align: center;
+        font-size: 2.2rem;
+        background: linear-gradient(120deg, var(--accent-color-light), var(--accent-color), var(--accent-color-dark));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-bottom: 20px;
+        animation: titleGlow 3s infinite alternate;
+    }
+    
+    @keyframes titleGlow {
+        0% {
+            text-shadow: 0 0 5px rgba(179, 100, 194, 0.3);
+        }
+        100% {
+            text-shadow: 0 0 15px rgba(179, 100, 194, 0.8), 0 0 30px rgba(179, 100, 194, 0.4);
+        }
+    }
+    
+    .magical-trees {
+        position: absolute;
+        top: -20px;
+        width: 120px;
+        height: 200px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%233a5d50' d='M50,10 L60,40 L80,40 L65,60 L75,90 L50,75 L25,90 L35,60 L20,40 L40,40 Z'/%3E%3C/svg%3E");
+        background-size: contain;
+        background-repeat: no-repeat;
+        opacity: 0.15;
+        z-index: -1;
+    }
+    
+    .left-tree {
+        left: -60px;
+        transform: scaleX(-1);
+        animation: treeSwayLeft 8s ease-in-out infinite;
+    }
+    
+    .right-tree {
+        right: -60px;
+        animation: treeSwayRight 8s ease-in-out infinite;
+    }
+    
+    @keyframes treeSwayLeft {
+        0%, 100% { transform: scaleX(-1) rotate(0deg); }
+        50% { transform: scaleX(-1) rotate(-2deg); }
+    }
+    
+    @keyframes treeSwayRight {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(2deg); }
+    }
+    
+    .login-card {
+        background: linear-gradient(135deg, rgba(23, 37, 32, 0.9), rgba(30, 58, 45, 0.8));
+        border-radius: 15px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 0 30px rgba(179, 100, 194, 0.2);
+        border: 1px solid rgba(179, 100, 194, 0.3);
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .card-glimmer {
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at center, rgba(179, 100, 194, 0.1), transparent 70%);
+        opacity: 0.5;
+        pointer-events: none;
+        animation: glimmerRotate 15s linear infinite;
+    }
+    
+    @keyframes glimmerRotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .floating-label {
+        position: relative;
+        margin-bottom: 25px;
+    }
+    
+    .floating-label input {
+        width: 100%;
+        padding: 15px 45px 15px 20px;
+        background: rgba(14, 20, 16, 0.6);
+        border: 1px solid rgba(179, 100, 194, 0.3);
+        border-radius: 50px;
+        font-size: 16px;
+        color: var(--text-color);
+        transition: all 0.3s ease;
+    }
+    
+    .floating-label label {
+        position: absolute;
+        top: 16px;
+        left: 20px;
+        font-size: 16px;
+        color: rgba(233, 228, 208, 0.7);
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+    
+    .floating-label input:focus,
+    .floating-label input:not(:placeholder-shown) {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(179, 100, 194, 0.2);
+        padding-top: 20px;
+        padding-bottom: 10px;
+    }
+    
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label {
+        transform: translateY(-12px) scale(0.8);
+        color: var(--accent-color-light);
+    }
+    
+    .input-icon {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--accent-color);
+        font-size: 18px;
+    }
+    
+    .form-group small {
+        margin-left: 20px;
+        font-size: 0.85rem;
+        color: rgba(233, 228, 208, 0.7);
+        display: block;
+        margin-top: 5px;
+    }
+    
+    .login-button {
+        width: 100%;
+        padding: 15px 20px;
+        margin-top: 10px;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+        transition: all 0.3s ease;
+    }
+    
+    .login-button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2), 0 0 30px rgba(179, 100, 194, 0.3);
+        background: linear-gradient(135deg, var(--accent-color-light), var(--accent-color));
+    }
+    
+    .button-icon {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        animation: iconFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes iconFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    
+    .messages {
+        margin-bottom: 20px;
+    }
+    
+    .animated-message {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        background-color: rgba(168, 50, 82, 0.15);
+        border-left: 4px solid var(--danger-color);
+        animation: messagePulse 2s infinite alternate;
+    }
+    
+    @keyframes messagePulse {
+        0% { box-shadow: 0 0 5px rgba(168, 50, 82, 0.3); }
+        100% { box-shadow: 0 0 15px rgba(168, 50, 82, 0.5); }
+    }
+    
+    .animated-message i {
+        color: var(--danger-color);
+        font-size: 1.2rem;
+    }
+    
+    .login-footer {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .return-link {
+        color: var(--text-color);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .return-link:hover {
+        color: var(--accent-color-light);
+        transform: translateX(-5px);
+    }
+    
+    @media (max-width: 768px) {
+        .login-container {
+            padding: 0 20px;
+        }
+        
+        .magical-trees {
+            display: none;
+        }
+        
+        .login-card {
+            padding: 30px 20px;
+        }
+    }
+</style>
 {% endblock %}

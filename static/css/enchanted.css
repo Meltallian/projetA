@@ -1,0 +1,740 @@
+/* Enchanted Forest Theme - Global enhancements for the entire app */
+
+/* ===== MAGICAL BACKGROUND EFFECTS ===== */
+body {
+    position: relative;
+    background-color: var(--light-bg);
+    background-image: 
+        linear-gradient(to bottom, rgba(14, 20, 16, 0.95), rgba(14, 20, 16, 0.8)),
+        radial-gradient(circle at 20% 30%, rgba(44, 88, 74, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(44, 88, 74, 0.2) 0%, transparent 40%),
+        radial-gradient(circle at 40% 70%, rgba(30, 58, 45, 0.3) 0%, transparent 60%);
+    background-attachment: fixed;
+    animation: backgroundShift 60s infinite alternate ease-in-out;
+}
+
+@keyframes backgroundShift {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+/* Add ambient fireflies throughout the entire site */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background-image: radial-gradient(circle at 10% 20%, rgba(179, 100, 194, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 90% 40%, rgba(100, 150, 255, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 40% 80%, rgba(200, 255, 100, 0.03) 0%, transparent 50%);
+    z-index: -1;
+    animation: ambientGlow 20s infinite alternate ease-in-out;
+}
+
+@keyframes ambientGlow {
+    0% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
+    100% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+}
+
+/* ===== GLOBAL FIREFLIES ===== */
+.global-fireflies {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.global-firefly {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.global-firefly:nth-child(1) {
+    top: 10%;
+    left: 15%;
+    box-shadow: 0 0 15px 5px rgba(179, 100, 194, 0.5);
+    animation: globalFireflyMove1 25s infinite ease-in-out, globalFireflyGlow 3s infinite ease-in-out;
+}
+
+.global-firefly:nth-child(2) {
+    top: 25%;
+    left: 80%;
+    box-shadow: 0 0 15px 5px rgba(100, 200, 255, 0.5);
+    animation: globalFireflyMove2 30s infinite ease-in-out, globalFireflyGlow 4s infinite ease-in-out;
+    animation-delay: 1s;
+}
+
+.global-firefly:nth-child(3) {
+    top: 60%;
+    left: 5%;
+    box-shadow: 0 0 15px 5px rgba(200, 255, 100, 0.5);
+    animation: globalFireflyMove3 20s infinite ease-in-out, globalFireflyGlow 5s infinite ease-in-out;
+    animation-delay: 2s;
+}
+
+.global-firefly:nth-child(4) {
+    top: 75%;
+    left: 60%;
+    box-shadow: 0 0 15px 5px rgba(255, 200, 100, 0.5);
+    animation: globalFireflyMove4 35s infinite ease-in-out, globalFireflyGlow 4s infinite ease-in-out;
+    animation-delay: 3s;
+}
+
+.global-firefly:nth-child(5) {
+    top: 35%;
+    left: 45%;
+    box-shadow: 0 0 15px 5px rgba(179, 100, 194, 0.5);
+    animation: globalFireflyMove5 28s infinite ease-in-out, globalFireflyGlow 3s infinite ease-in-out;
+    animation-delay: 1.5s;
+}
+
+.global-firefly:nth-child(6) {
+    top: 15%;
+    left: 65%;
+    box-shadow: 0 0 15px 5px rgba(130, 200, 180, 0.5);
+    animation: globalFireflyMove6 32s infinite ease-in-out, globalFireflyGlow 3.5s infinite ease-in-out;
+    animation-delay: 0.5s;
+}
+
+.global-firefly:nth-child(7) {
+    top: 85%;
+    left: 30%;
+    box-shadow: 0 0 15px 5px rgba(220, 150, 100, 0.5);
+    animation: globalFireflyMove7 28s infinite ease-in-out, globalFireflyGlow 4.5s infinite ease-in-out;
+    animation-delay: 2.5s;
+}
+
+@keyframes globalFireflyGlow {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+@keyframes globalFireflyMove1 {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(100px, 50px);
+    }
+    50% {
+        transform: translate(50px, 100px);
+    }
+    75% {
+        transform: translate(-50px, 50px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove2 {
+    0% {
+        transform: translate(0, 0);
+    }
+    33% {
+        transform: translate(-100px, 80px);
+    }
+    66% {
+        transform: translate(-60px, -40px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove3 {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(120px, -50px);
+    }
+    50% {
+        transform: translate(200px, 30px);
+    }
+    75% {
+        transform: translate(100px, 80px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove4 {
+    0% {
+        transform: translate(0, 0);
+    }
+    33% {
+        transform: translate(-80px, -120px);
+    }
+    66% {
+        transform: translate(60px, -80px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove5 {
+    0% {
+        transform: translate(0, 0);
+    }
+    25% {
+        transform: translate(60px, 80px);
+    }
+    50% {
+        transform: translate(-80px, 40px);
+    }
+    75% {
+        transform: translate(-40px, -60px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove6 {
+    0% {
+        transform: translate(0, 0);
+    }
+    30% {
+        transform: translate(-100px, 40px);
+    }
+    60% {
+        transform: translate(50px, 100px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+@keyframes globalFireflyMove7 {
+    0% {
+        transform: translate(0, 0);
+    }
+    40% {
+        transform: translate(120px, -30px);
+    }
+    70% {
+        transform: translate(20px, -120px);
+    }
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+/* ===== FOG AND MIST EFFECTS ===== */
+.forest-fog {
+    position: fixed;
+    height: 200px;
+    width: 100%;
+    background: rgba(30, 58, 45, 0.15);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.4;
+    filter: blur(30px);
+}
+
+.top-fog {
+    top: -100px;
+    animation: driftFogTop 60s linear infinite alternate;
+}
+
+.bottom-fog {
+    bottom: -100px;
+    animation: driftFogBottom 80s linear infinite alternate;
+}
+
+@keyframes driftFogTop {
+    0% {
+        transform: translateX(-50%) translateY(0);
+    }
+    100% {
+        transform: translateX(50%) translateY(10px);
+    }
+}
+
+@keyframes driftFogBottom {
+    0% {
+        transform: translateX(30%) translateY(0);
+    }
+    100% {
+        transform: translateX(-30%) translateY(-15px);
+    }
+}
+
+.forest-mist {
+    position: fixed;
+    width: 400px;
+    height: 100%;
+    background: radial-gradient(ellipse at center, rgba(179, 100, 194, 0.05) 0%, transparent 70%);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.5;
+    filter: blur(40px);
+}
+
+.left-mist {
+    left: -200px;
+    animation: driftMistLeft 70s ease-in-out infinite alternate;
+}
+
+.right-mist {
+    right: -200px;
+    animation: driftMistRight 85s ease-in-out infinite alternate;
+}
+
+@keyframes driftMistLeft {
+    0% {
+        transform: translateX(0) translateY(-20%);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateX(150px) translateY(20%);
+        opacity: 0.6;
+    }
+}
+
+@keyframes driftMistRight {
+    0% {
+        transform: translateX(0) translateY(20%);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateX(-150px) translateY(-20%);
+        opacity: 0.6;
+    }
+}
+
+/* ===== SHADOW CREATURE EFFECTS ===== */
+.shadow-creature {
+    position: fixed;
+    bottom: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23000' fill-opacity='0.4' d='M20,80 Q50,40 80,80 L80,100 L20,100 Z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.2;
+    filter: blur(5px);
+    animation: creatureMovement 20s ease-in-out infinite alternate;
+}
+
+@keyframes creatureMovement {
+    0% {
+        transform: translateX(0) translateY(0) scale(1);
+        opacity: 0.1;
+    }
+    50% {
+        transform: translateX(-20px) translateY(-10px) scale(1.1);
+        opacity: 0.3;
+    }
+    100% {
+        transform: translateX(-40px) translateY(0) scale(1);
+        opacity: 0.1;
+    }
+}
+
+/* ===== IMPROVED CARD EFFECTS ===== */
+.card, .waiting-card, .game-card, .character-card, .clue-card, .event-card, .player-card,
+.game-status, .info-block, .refresh-status, .inquiry-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2), 0 0 20px rgba(179, 100, 194, 0.15);
+    border: 1px solid rgba(179, 100, 194, 0.2);
+    background: linear-gradient(135deg, rgba(23, 37, 32, 0.9), rgba(30, 58, 45, 0.8));
+    z-index: 1;
+}
+
+.card:hover, .waiting-card:hover, .game-card:hover, .character-card:hover, 
+.clue-card:hover, .event-card:hover, .player-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 30px rgba(179, 100, 194, 0.2);
+    transform: translateY(-3px);
+}
+
+.card::before, .waiting-card::before, .game-card::before, .character-card::before,
+.clue-card::before, .event-card::before, .player-card::before,
+.game-status::before, .info-block::before, .refresh-status::before, .inquiry-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6' viewBox='0 0 6 6'%3E%3Cpath fill='%233a5d50' fill-opacity='0.15' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E"),
+        radial-gradient(circle at 30% 40%, rgba(179, 100, 194, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 70% 60%, rgba(179, 100, 194, 0.05) 0%, transparent 40%);
+    background-size: auto, cover, cover;
+    z-index: -1;
+    opacity: 0.1;
+    animation: cardPatternShift 20s infinite alternate ease-in-out;
+}
+
+.card::after, .waiting-card::after, .game-card::after, .character-card::after,
+.clue-card::after, .event-card::after, .player-card::after,
+.game-status::after, .info-block::after, .refresh-status::after, .inquiry-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.05) 25%, 
+        rgba(255, 255, 255, 0.1) 50%, 
+        rgba(255, 255, 255, 0.05) 75%, 
+        transparent 100%);
+    z-index: 1;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.card:hover::after, .waiting-card:hover::after, .game-card:hover::after, 
+.character-card:hover::after, .clue-card:hover::after, .event-card:hover::after, 
+.player-card:hover::after, .game-status:hover::after, .info-block:hover::after, 
+.refresh-status:hover::after, .inquiry-card:hover::after {
+    opacity: 1;
+    animation: cardShimmer 1.5s ease-in-out;
+}
+
+@keyframes cardShimmer {
+    0% {
+        transform: translateX(0%);
+    }
+    100% {
+        transform: translateX(50%);
+    }
+}
+
+@keyframes cardPatternShift {
+    0% {
+        opacity: 0.05;
+        background-position: 0% 0%;
+    }
+    100% {
+        opacity: 0.15;
+        background-position: 100% 100%;
+    }
+}
+
+/* ===== ENHANCED TEXT EFFECTS ===== */
+.enchanted-text {
+    background: linear-gradient(45deg, var(--accent-color-light), var(--accent-color), var(--accent-color-dark));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    font-weight: 600;
+}
+
+.glowing-text {
+    color: var(--accent-color-light);
+    text-shadow: 0 0 5px rgba(179, 100, 194, 0.5), 0 0 15px rgba(179, 100, 194, 0.3);
+    animation: textPulse 3s infinite alternate;
+}
+
+@keyframes textPulse {
+    0% {
+        text-shadow: 0 0 5px rgba(179, 100, 194, 0.3);
+    }
+    100% {
+        text-shadow: 0 0 10px rgba(179, 100, 194, 0.7), 0 0 20px rgba(179, 100, 194, 0.4);
+    }
+}
+
+/* ===== MAGICAL BUTTON ENHANCEMENTS ===== */
+.button, button, input[type="submit"], input[type="button"] {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.button::after, button::after, input[type="submit"]::after, input[type="button"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    transform: scale(0) translate(-50%, -50%);
+    opacity: 0;
+    z-index: -1;
+    transition: transform 0.5s, opacity 0.3s;
+}
+
+.button:active::after, button:active::after, 
+input[type="submit"]:active::after, input[type="button"]:active::after {
+    transform: scale(80) translate(-50%, -50%);
+    opacity: 0.2;
+}
+
+/* ===== ANIMATED HEADINGS ===== */
+h1, h2, h3 {
+    position: relative;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3), 0 0 10px rgba(179, 100, 194, 0.3);
+}
+
+h1::after, h2::after, h3::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(179, 100, 194, 0.7), transparent);
+    transform: scaleX(0.3);
+    opacity: 0;
+    transition: all 0.5s ease;
+}
+
+h1:hover::after, h2:hover::after, h3:hover::after {
+    transform: scaleX(1);
+    opacity: 1;
+}
+
+/* ===== INTERACTIVE BUTTONS ===== */
+.button, button, input[type="submit"], input[type="button"] {
+    background: linear-gradient(135deg, rgba(179, 100, 194, 0.8), rgba(125, 70, 150, 0.9));
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 10px rgba(179, 100, 194, 0.2);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+.button:hover, button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(0,0,0,0.3), 0 0 20px rgba(179, 100, 194, 0.4);
+}
+
+.button:active, button:active, input[type="submit"]:active, input[type="button"]:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.button::before, button::before, input[type="submit"]::before, input[type="button"]::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: all 0.5s ease;
+}
+
+.button:hover::before, button:hover::before, 
+input[type="submit"]:hover::before, input[type="button"]:hover::before {
+    left: 100%;
+}
+
+/* ===== NOTIFICATION ANIMATIONS ===== */
+.notification {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(23, 37, 32, 0.9), rgba(30, 58, 45, 0.8));
+    border-left: 5px solid var(--accent-color);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2), 0 0 20px rgba(179, 100, 194, 0.1);
+    animation: notificationEnter 0.5s ease-in-out, notificationGlow 2s infinite alternate;
+}
+
+@keyframes notificationEnter {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes notificationGlow {
+    0% {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2), 0 0 5px rgba(179, 100, 194, 0.1);
+    }
+    100% {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2), 0 0 20px rgba(179, 100, 194, 0.3);
+    }
+}
+
+/* ===== NEW: ANIMATED FOREST ELEMENTS ===== */
+.forest-element {
+    position: relative;
+    margin: 20px 0;
+}
+
+.forest-element::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath fill='%233a5d50' fill-opacity='0.2' d='M10,5 L15,15 L5,15 Z'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    opacity: 0.1;
+    z-index: -1;
+    animation: patternShift 40s linear infinite;
+}
+
+@keyframes patternShift {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 500px 500px;
+    }
+}
+
+/* ===== NEW: MAGICAL DIVIDERS ===== */
+.magical-divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--accent-color), transparent);
+    margin: 30px auto;
+    position: relative;
+    width: 80%;
+}
+
+.magical-divider.with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    height: 30px;
+}
+
+.magical-divider.with-icon::before, 
+.magical-divider.with-icon::after {
+    content: '';
+    flex-grow: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--accent-color));
+}
+
+.magical-divider.with-icon::after {
+    background: linear-gradient(to left, transparent, var(--accent-color));
+}
+
+.magical-divider.with-icon span {
+    padding: 0 15px;
+    color: var(--accent-color);
+    font-size: 1.2rem;
+}
+
+.magical-divider.with-icon i {
+    color: var(--accent-color);
+}
+
+/* ===== ENHANCED FORM FIELD ANIMATIONS ===== */
+input:focus + label, 
+textarea:focus + label, 
+select:focus + label {
+    transform: translateY(-25px) scale(0.8);
+    color: var(--accent-color-light);
+}
+
+.floating-label {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.floating-label input,
+.floating-label textarea,
+.floating-label select {
+    width: 100%;
+    padding: 10px 15px;
+    background: rgba(14, 20, 16, 0.6);
+    border: 1px solid rgba(179, 100, 194, 0.3);
+    border-radius: 5px;
+    font-size: 16px;
+    color: var(--text-color);
+    transition: border-color 0.3s ease;
+}
+
+.floating-label label {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    font-size: 16px;
+    color: rgba(233, 228, 208, 0.7);
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.floating-label input:focus,
+.floating-label textarea:focus,
+.floating-label select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(179, 100, 194, 0.2);
+}
+
+.floating-label input:not(:placeholder-shown) + label,
+.floating-label textarea:not(:placeholder-shown) + label {
+    transform: translateY(-25px) scale(0.8);
+    color: var(--accent-color-light);
+}
+
+/* ===== RESPONSIVE ANIMATIONS ===== */
+@media (max-width: 768px) {
+    .global-firefly {
+        display: none;
+    }
+    
+    .button:hover, button:hover, input[type="submit"]:hover, input[type="button"]:hover {
+        transform: none;
+    }
+    
+    .card:hover, .waiting-card:hover, .game-card:hover {
+        transform: none;
+    }
+} 

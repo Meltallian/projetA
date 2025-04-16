@@ -4,6 +4,7 @@
 <head>
     <title>{% block title %}The Enchanted Forest Mystery{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/enchanted.css' %}">
     <link rel="stylesheet" href="{% static 'css/game.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -817,6 +818,25 @@
     {% block extra_styles %}{% endblock %}
 </head>
 <body>
+    <!-- Global Fireflies Effect -->
+    <div class="global-fireflies">
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+        <div class="global-firefly"></div>
+    </div>
+    
+    <!-- Fog and Mist Effects -->
+    <div class="forest-fog top-fog"></div>
+    <div class="forest-fog bottom-fog"></div>
+    <div class="forest-mist left-mist"></div>
+    <div class="forest-mist right-mist"></div>
+    
+    <!-- Animated Shadows -->
+    <div class="shadow-creature"></div>
     <div class="firefly firefly-1"></div>
     <div class="firefly firefly-2"></div>
     <div class="firefly firefly-3"></div>
