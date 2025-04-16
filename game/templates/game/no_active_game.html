@@ -7,7 +7,9 @@
         <div class="firefly-animation"></div>
         <div class="refresh-status">
             <div class="progress-container"><div class="progress"></div></div>
-            <button id="refresh-button"><i class="fas fa-sync-alt"></i> Check Now</button>
+            <div class="auto-refresh-message">
+                <i class="fas fa-sync-alt fa-spin"></i> Automatically checking for new games every 10 seconds
+            </div>
         </div>
         <div class="waiting-content">
             <h3><i class="fas fa-hourglass-half"></i> The Forest Sleeps</h3>
@@ -25,7 +27,7 @@
     // Auto-refresh functionality
     let progress = 0;
     const progressBar = document.querySelector('.progress');
-    const refreshInterval = 30; // seconds
+    const refreshInterval = 10; // seconds (changed from 30 to 10)
     const updateFrequency = 100; // ms
     const steps = (refreshInterval * 1000) / updateFrequency;
     const increment = 100 / steps;
@@ -65,12 +67,6 @@
         // Start progress bar
         resetProgress();
         const progressTimer = setInterval(updateProgress, updateFrequency);
-        
-        // Setup manual refresh button
-        document.getElementById('refresh-button').addEventListener('click', function() {
-            resetProgress();
-            checkForGame();
-        });
     });
 </script>
 {% endblock %}
@@ -193,29 +189,16 @@
         transition: width 0.1s linear;
     }
     
-    #refresh-button {
-        background: rgba(179, 100, 194, 0.2);
-        border: 1px solid rgba(179, 100, 194, 0.3);
-        color: white;
-        font-size: 15px;
-        padding: 10px 20px;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    .auto-refresh-message {
+        color: var(--text-color-muted, #b3a5cb);
+        font-size: 0.9rem;
+        text-align: center;
+        margin: 12px 0;
     }
-    
-    #refresh-button i {
+
+    .auto-refresh-message i {
         margin-right: 8px;
-    }
-    
-    #refresh-button:hover {
-        background: rgba(179, 100, 194, 0.4);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(179, 100, 194, 0.3);
+        color: rgba(179, 100, 194, 0.7);
     }
     
     /* Firefly animation */
